@@ -44,7 +44,8 @@
 
                     <!-- Modal Detail Obat -->
                     <div id="detailModal{{ $obat->id }}"
-                        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+                        class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+
                         <div class="bg-white rounded-lg shadow-lg w-1/2 p-6">
                             <h3 class="text-lg font-semibold mb-4">Detail Obat: {{ $obat->nama_obat }}</h3>
                             <ul class="mb-4">
@@ -68,7 +69,7 @@
     </div>
 
     <!-- Modal Tambah Obat Masuk -->
-    <div id="addModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div id="addModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
         <div class="bg-white rounded-lg shadow-lg w-1/2 p-6">
             <h3 class="text-lg font-semibold mb-4">Tambah Obat Masuk</h3>
             {{-- <form action="{{ route('admin.obat.store') }}" method="POST"> --}}
@@ -127,11 +128,15 @@
 
     <script>
         function openModal(id) {
-            document.getElementById(id).classList.remove('hidden');
+            const modal = document.getElementById(id);
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
         }
 
         function closeModal(id) {
-            document.getElementById(id).classList.add('hidden');
+            const modal = document.getElementById(id);
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
         }
     </script>
 @endsection
