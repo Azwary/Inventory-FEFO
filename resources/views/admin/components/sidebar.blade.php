@@ -1,5 +1,5 @@
 <aside class="w-64 bg-white shadow-lg">
-    <div class="p-4 flex items-center space-x-2 border-b">
+    <div class="p-4 flex items-center justify-center space-x-2 border-b">
         {{-- <img src="{{ asset('logo.png') }}" alt="Logo" class="h-10 w-10"> --}}
         <span class="font-bold text-lg">Inventori FEFO</span>
     </div>

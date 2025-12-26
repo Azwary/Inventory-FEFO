@@ -22,8 +22,8 @@
             <div class="flex items-center gap-2">
                 <i class="bi bi-person-circle text-3xl"></i>
                 <div class="flex flex-col">
-                    <span class="font-medium">{{ Auth::user()->nama }}</span>
-                    <span class="text-sm text-gray-500">{{ Auth::user()->role }}</span>
+                    <span class="font-medium">{{ Auth::user()->role }}</span>
+                    <span class="text-sm text-gray-500">{{ Auth::user()->nama }}</span>
                 </div>
             </div>
 
