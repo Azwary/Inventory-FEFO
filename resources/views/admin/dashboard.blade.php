@@ -1,17 +1,24 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
-    </x-slot>
+@extends('admin.layouts.app')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    {{ __("You're logged in! admin") }}
-                </div>
-            </div>
-        </div>
+@section('title', 'Dashboard Admin')
+
+@section('content')
+
+    <h1 class="text-xl font-bold mb-4">Dashboard Utama</h1>
+
+    <div class="grid grid-cols-4 gap-4 mb-6">
+        <x-admin.components.dashboard-box>Box 1</x-admin.components.dashboard-box>
+        <x-admin.components.dashboard-box>Box 2</x-admin.components.dashboard-box>
+        <x-admin.components.dashboard-box>Box 3</x-admin.components.dashboard-box>
+        <x-admin.components.dashboard-box>Box 4</x-admin.components.dashboard-box>
     </div>
-</x-app-layout>
+
+    <div class="grid grid-cols-2 gap-6">
+        <div class="bg-white p-4 rounded shadow">
+            <h2 class="font-bold mb-4">Notifikasi Kekadaluarsaan Terbaru (FEFO) </h2>
+            <x-admin.components.notifications :notifications="$notifications" />
+        </div>
+        <x-admin.components.quick-actions />
+    </div>
+
+@endsection

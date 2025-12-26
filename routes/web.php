@@ -1,6 +1,10 @@
 <?php
 
+use App\Http\Controllers\AdminDashboard;
+use App\Http\Controllers\Notifikasi;
+use App\Http\Controllers\pengeluaran;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Stok;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,11 +15,11 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     $user = Auth::user();
 
-    if ($user->role === 'admin') {
+    if ($user->role === 'Admin') {
         return redirect()->route('admin.dashboard');
     }
 
-    if ($user->role === 'pimpinan') {
+    if ($user->role === 'Pimpinan') {
         return redirect()->route('pimpinan.dashboard');
     }
 
@@ -29,9 +33,16 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
+    Route::get('/', [AdminDashboard::class, 'index'])->name('index');
+    Route::get('/dashboard', [AdminDashboard::class, 'dashboard'])->name('dashboard');
+    Route::get('/stok', [Stok::class, 'index'])->name('stok.index');
+    Route::get('/stok/{id}', [Stok::class, 'show'])->name('obat.show');
+    Route::get('/pengeluaran', [pengeluaran::class, 'index'])->name('pengeluaran-obat.index');
+    Route::get('/notifikasi', [Notifikasi::class, 'index'])->name('notifikasi-kedaluwarsa.index');
+
+    // Route::get('/dashboard', function () {
+    //     return view('admin.dashboard');
+    // })->name('dashboard');
 });
 
 
