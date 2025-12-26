@@ -20,9 +20,13 @@
             {{-- <span>{{ auth()->user()->nama }}</span> --}}
             {{-- <span>{{ Auth::check() ? Auth::user()->nama : 'Guest' }}</span> --}}
             <div class="flex items-center gap-2">
-                <i class="bi bi-person-circle"></i>
-                <span>{{ Auth::user()->nama }}</span>
+                <i class="bi bi-person-circle text-3xl"></i>
+                <div class="flex flex-col">
+                    <span class="font-medium">{{ Auth::user()->nama }}</span>
+                    <span class="text-sm text-gray-500">{{ Auth::user()->role }}</span>
+                </div>
             </div>
+
 
 
             {{-- <img src="{{ asset('admin-avatar.png') }}" alt="Admin" class="h-8 w-8 rounded-full"> --}}
