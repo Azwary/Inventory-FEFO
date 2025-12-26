@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Dashboard Admin')
+@section('title', 'Notifikasi Kekadaluarsaan')
 
 @section('content')
 
