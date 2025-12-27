@@ -13,19 +13,23 @@
                 Dashboard
             </a>
 
-            <a href="{{ route('admin.stok.index') }}" class="block px-4 py-2 hover:bg-gray-200">
+            <a href="{{ route('admin.stok.index') }}"
+                class="block px-4 py-2 hover:bg-gray-200 {{ request()->routeIs('admin.stok.index') ? 'bg-gray-200 font-bold' : '' }}">
                 Persediaan / Stok
             </a>
 
-            <a href="{{ route('admin.pengeluaran-obat.index') }}" class="block px-4 py-2 hover:bg-gray-200">
+            <a href="{{ route('admin.pengeluaran-obat.index') }}"
+                class="block px-4 py-2 hover:bg-gray-200 {{ request()->routeIs('admin.pengeluaran-obat.index') ? 'bg-gray-200 font-bold' : '' }}">
                 Pengeluaran Obat
             </a>
 
-            <a href="{{ route('admin.notifikasi-kedaluwarsa.index') }}" class="block px-4 py-2 hover:bg-gray-200">
+            <a href="{{ route('admin.notifikasi-kedaluwarsa.index') }}"
+                class="block px-4 py-2 hover:bg-gray-200 {{ request()->routeIs('admin.notifikasi-kedaluwarsa.index') ? 'bg-gray-200 font-bold' : '' }}">
                 Notifikasi Kedaluwarsa
             </a>
 
-            <a href="{{ route('admin.laporan-audit.index') }}" class="block px-4 py-2 hover:bg-gray-200">
+            <a href="{{ route('admin.laporan-audit.index') }}"
+                class="block px-4 py-2 hover:bg-gray-200 {{ request()->routeIs('admin.laporan-audit.index') ? 'bg-gray-200 font-bold' : '' }}">
                 Laporan & Audit
             </a>
         </nav>
@@ -41,11 +45,18 @@
                 Dashboard
             </a>
 
-            <a href="{{ route('pimpinan.stok.index') }}" class="block px-4 py-2 hover:bg-gray-200">
+            <a href="{{ route('pimpinan.stok.index') }}"
+                class="block px-4 py-2 hover:bg-gray-200 {{ request()->routeIs('pimpinan.stok.index') ? 'bg-gray-200 font-bold' : '' }}">
                 Persediaan / Stok
             </a>
 
-            <a href="{{ route('pimpinan.laporan-audit.index') }}" class="block px-4 py-2 hover:bg-gray-200">
+            <a href="{{ route('pimpinan.notifikasi-kedaluwarsa.index') }}"
+                class="block px-4 py-2 hover:bg-gray-200 {{ request()->routeIs('pimpinan.notifikasi-kedaluwarsa.index') ? 'bg-gray-200 font-bold' : '' }}">
+                Notifikasi Kedaluwarsa
+            </a>
+
+            <a href="{{ route('pimpinan.laporan-audit.index') }}"
+                class="block px-4 py-2 hover:bg-gray-200 {{ request()->routeIs('pimpinan.laporan-audit.index') ? 'bg-gray-200 font-bold' : '' }}">
                 Laporan & Audit
             </a>
 
