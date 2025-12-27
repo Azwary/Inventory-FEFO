@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Pimpinan;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 
-class Stok extends Controller
+class StokController extends Controller
 {
     // Menampilkan list stok obat (dummy)
     public function index()
@@ -43,7 +44,7 @@ class Stok extends Controller
             ],
         ]);
 
-        return view('admin.stok', compact('obats'));
+        return view('views.pimpinan.stok', compact('obats'));
     }
 
     // Menampilkan detail obat berdasarkan id
@@ -87,6 +88,6 @@ class Stok extends Controller
 
         $obat = $obats[$id] ?? abort(404);
 
-        return view('admin.obat_detail', compact('obat'));
+        return view('views.pimpinan.obat_detail', compact('obat'));
     }
 }

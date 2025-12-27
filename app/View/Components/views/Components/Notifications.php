@@ -1,19 +1,21 @@
 <?php
 
-namespace App\View\Components\Admin\Components;
+namespace App\View\Components\views\Components;
 
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class DashboardBox extends Component
+class Notifications extends Component
 {
+    public $notifications;
+
     /**
      * Create a new component instance.
      */
-    public function __construct()
+    public function __construct($notifications = [])
     {
-        //
+        $this->notifications = $notifications;
     }
 
     /**
@@ -21,6 +23,6 @@ class DashboardBox extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('admin.components.dashboard-box');
+        return view('views.components.notifications');
     }
 }

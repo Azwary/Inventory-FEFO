@@ -1,11 +1,12 @@
-@extends('admin.layouts.app')
+@extends('views.layouts.app')
 
 @section('title', 'Notifikasi Kekadaluarsaan')
 
 @section('content')
-
     <div class="p-6 bg-white rounded-lg shadow mb-4">
         <h2 class="text-xl font-semibold">Notifikasi Kekadaluarsaan</h2>
+    </div>
+    <div class="p-6 bg-white rounded-lg shadow mb-4">
 
 
         <div class="">

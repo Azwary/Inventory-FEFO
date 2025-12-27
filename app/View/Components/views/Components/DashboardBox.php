@@ -1,12 +1,12 @@
 <?php
 
-namespace App\View\Components\Admin\Components;
+namespace App\View\Components\views\Components;
 
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class QuickActions extends Component
+class DashboardBox extends Component
 {
     /**
      * Create a new component instance.
@@ -21,6 +21,6 @@ class QuickActions extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('admin.components.quick-actions');
+        return view('views.components.dashboard-box');
     }
 }

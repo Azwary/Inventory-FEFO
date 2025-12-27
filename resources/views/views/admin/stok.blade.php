@@ -1,11 +1,12 @@
-@extends('admin.layouts.app')
+@extends('views.layouts.app')
 
 @section('title', 'Persediaan / Stok Obat')
 
 @section('content')
+    <div class="p-6 bg-white rounded-lg shadow mb-4">
+        <h2 class="text-xl font-semibold">Persediaan / Stok Obat</h2>
+    </div>
     <div class="p-6 bg-white rounded-lg shadow">
-        <h2 class="text-xl font-semibold mb-4">Persediaan / Stok Obat</h2>
-
         <div class="flex items-center mb-4 gap-2">
             <input type="text" placeholder="Search..." class="border rounded px-3 py-1 w-1/3">
             <button class="bg-gray-200 px-3 py-1 rounded">Filter FEFO (Exp ASC)</button>
