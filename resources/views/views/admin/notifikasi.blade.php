@@ -7,8 +7,6 @@
         <h2 class="text-xl font-semibold">Notifikasi Kekadaluarsaan</h2>
     </div>
     <div class="p-6 bg-white rounded-lg shadow mb-4">
-
-
         <div class="">
             <h2 class="font-bold mb-4">Daftar Batch Kritis (FEFO Alert)</h2>
 
@@ -33,7 +31,7 @@
 
                     <!-- Tombol dengan icon saja -->
                     <div class="flex space-x-2 ml-2">
-                        <button class="p-2 text-black rounded text-sm hover:bg-gray-200" title="Hapus"><svg
+                        <button class="p-2 text-black rounded text-sm hover:bg-red-200" title="Hapus"><svg
                                 xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" class="lucide lucide-trash-icon lucide-trash">
@@ -41,7 +39,7 @@
                                 <path d="M3 6h18" />
                                 <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                             </svg></button>
-                        <button class="p-2 text-black rounded text-sm hover:bg-gray-200" title="Edit"><svg
+                        <button class="p-2 text-black rounded text-sm hover:bg-green-200" title="Edit"><svg
                                 xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" class="lucide lucide-square-pen-icon lucide-square-pen">
