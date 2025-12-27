@@ -27,6 +27,8 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
         $request->session()->regenerate();
 
+        $request->session()->forget('url.intended');
+
         $user = Auth::user();
 
         if ($user->role === 'Admin') {
@@ -37,9 +39,10 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('pimpinan.dashboard');
         }
 
-        Auth::logout(); // logout user jika role tidak valid
+        Auth::logout();
         return redirect('/')->with('error', 'Akses tidak diperbolehkan.');
     }
+
 
 
 
