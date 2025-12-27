@@ -18,7 +18,7 @@
         <!-- Notifikasi: lebih lebar, misal 8/12 -->
         <div class="bg-white p-4 rounded shadow col-span-8 flex flex-col">
             <h2 class="font-bold mb-4">Notifikasi Kekadaluarsaan Terbaru (FEFO)</h2>
-            <x-notifications="$notifications" class="flex-1" />
+            <x-notifications :notifications="$notifications" class="flex-1" />
 
         </div>
 
