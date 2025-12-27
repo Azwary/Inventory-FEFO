@@ -4,8 +4,15 @@
 
         <div class="flex items-center space-x-4">
             {{-- notifikasi --}}
+            @php
+                $routeNotif =
+                    Auth::user()->role === 'Pimpinan'
+                        ? route('pimpinan.notifikasi-kedaluwarsa.index')
+                        : route('admin.notifikasi-kedaluwarsa.index');
+            @endphp
+
             @if (!empty($notifications) && count($notifications) > 0)
-                <a href="{{ route('admin.notifikasi-kedaluwarsa.index') }}">
+                <a href="{{ $routeNotif }}">
                     <button class="relative">
                         <span class="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
