@@ -45,6 +45,10 @@
                 Persediaan / Stok
             </a>
 
+            <a href="{{ route('pimpinan.laporan-audit.index') }}" class="block px-4 py-2 hover:bg-gray-200">
+                Laporan & Audit
+            </a>
+
             {{-- <a href="{{ route('pimpinan.laporan.index') }}" class="block px-4 py-2 hover:bg-gray-200">
                 Laporan Stok
             </a> --}}

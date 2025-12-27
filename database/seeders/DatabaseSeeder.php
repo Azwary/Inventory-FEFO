@@ -13,24 +13,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Default Admin
-        User::factory()->create([
+        User::create([
             'nama' => 'Administrator',
             'username' => 'admin',
             'password' => Hash::make('admin123'),
             'role' => 'Admin',
-            'created_at' => now(),
-            'updated_at' => now(),
         ]);
 
-        // Default Pimpinan
-        User::factory()->create([
+        User::create([
             'nama' => 'Pimpinan',
             'username' => 'pimpinan',
             'password' => Hash::make('pimpinan123'),
             'role' => 'Pimpinan',
-            'created_at' => now(),
-            'updated_at' => now(),
         ]);
     }
 }

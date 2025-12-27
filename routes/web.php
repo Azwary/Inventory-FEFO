@@ -55,6 +55,7 @@ Route::middleware(['auth', 'role:Pimpinan'])->prefix('pimpinan')->name('pimpinan
     Route::get('/dashboard', [PimpinanDashboardController::class, 'dashboard'])->name('dashboard');
     Route::get('/stok', [PimpinanStokController::class, 'index'])->name('stok.index');
     Route::get('/stok/{id}', [PimpinanStokController::class, 'show'])->name('obat.show');
+    Route::get('/laporan', [PimpinanLaporanController::class, 'index'])->name('laporan-audit.index');
 });
 
 Route::get('/test', function () {

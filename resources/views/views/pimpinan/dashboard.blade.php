@@ -23,7 +23,7 @@
         <canvas id="fefoChart" height="80"></canvas>
 
         <div class="text-center mt-4">
-            <a href="#" class="text-blue-600 text-sm hover:underline">
+            <a href="{{ route('pimpinan.laporan-audit.index') }}" class="text-blue-600 text-sm hover:underline">
                 Lihat Laporan Detail
             </a>
         </div>
