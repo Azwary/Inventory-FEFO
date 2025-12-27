@@ -4,17 +4,22 @@
 
         <div class="flex items-center space-x-4">
             {{-- notifikasi --}}
-            @php
-                $routeNotif =
-                    Auth::user()->role === 'Pimpinan'
-                        ? route('pimpinan.notifikasi-kedaluwarsa.index')
-                        : route('admin.notifikasi-kedaluwarsa.index');
-            @endphp
-
-            @if (!empty($notifications) && count($notifications) > 0)
-                <a href="{{ $routeNotif }}">
-                    <button class="relative">
-                        <span class="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
+            @if (Auth::user()->role !== 'Pimpinan')
+                @if (!empty($notifications) && count($notifications) > 0)
+                    <a href="{{ route('admin.notifikasi-kedaluwarsa.index') }}">
+                        <button class="relative">
+                            <span class="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-bell-icon lucide-bell">
+                                <path d="M10.268 21a2 2 0 0 0 3.464 0" />
+                                <path
+                                    d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" />
+                            </svg>
+                        </button>
+                    </a>
+                @else
+                    <button class="relative cursor-not-allowed opacity-50" disabled>
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                             stroke-linejoin="round" class="lucide lucide-bell-icon lucide-bell">
@@ -23,17 +28,7 @@
                                 d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" />
                         </svg>
                     </button>
-                </a>
-            @else
-                <button class="relative cursor-not-allowed opacity-50" disabled>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round" class="lucide lucide-bell-icon lucide-bell">
-                        <path d="M10.268 21a2 2 0 0 0 3.464 0" />
-                        <path
-                            d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" />
-                    </svg>
-                </button>
+                @endif
             @endif
 
             {{-- user --}}
