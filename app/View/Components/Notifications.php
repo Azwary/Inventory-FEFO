@@ -1,19 +1,21 @@
 <?php
 
-namespace App\View\Components\views\Components;
+namespace App\View\Components;
 
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class QuickActions extends Component
+class Notifications extends Component
 {
+    public $notifications;
+
     /**
      * Create a new component instance.
      */
-    public function __construct()
+    public function __construct($notifications = [])
     {
-        //
+        $this->notifications = $notifications;
     }
 
     /**
@@ -21,6 +23,6 @@ class QuickActions extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('views.components.quick-actions');
+        return view('views.components.notifications');
     }
 }

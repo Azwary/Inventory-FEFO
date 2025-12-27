@@ -8,10 +8,10 @@
     </div>
 
     <div class="grid grid-cols-4 gap-4 mb-6">
-        <x-views.components.dashboard-box>Box 1</x-views.components.dashboard-box>
-        <x-views.components.dashboard-box>Box 2</x-views.components.dashboard-box>
-        <x-views.components.dashboard-box>Box 3</x-views.components.dashboard-box>
-        <x-views.components.dashboard-box>Box 4</x-views.components.dashboard-box>
+        <x-dashboard-box>Box 1</x-dashboard-box>
+        <x-dashboard-box>Box 2</x-dashboard-box>
+        <x-dashboard-box>Box 3</x-dashboard-box>
+        <x-dashboard-box>Box 4</x-dashboard-box>
     </div>
 
     <div class="bg-white p-4 rounded shadow">
