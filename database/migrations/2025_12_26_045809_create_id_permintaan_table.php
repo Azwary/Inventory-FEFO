@@ -14,8 +14,10 @@ return new class extends Migration
         Schema::create('id_permintaan', function (Blueprint $table) {
             $table->id('id');
             $table->foreignId('id_permintaan')->constrained('permintaan_barang', 'id_permintaan')->onDelete('cascade');
-            $table->foreignId('id_barang')->constrained('barang', 'id_barang')->onDelete('cascade');
+            $table->string('id_barang', 5);
             $table->integer('jumlah');
+
+            $table->foreign('id_barang')->references('id_barang')->on('barang')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -43,6 +43,7 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/', [DashboardController::class, 'index'])->name('index');
     Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
     Route::get('/stok', [StokController::class, 'index'])->name('stok.index');
+    Route::post('/stok', [StokController::class, 'store'])->name('stok.store');
     Route::get('/stok/{id}', [StokController::class, 'show'])->name('obat.show');
     Route::get('/pengeluaran', [PengeluaranController::class, 'index'])->name('pengeluaran-obat.index');
     Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi-kedaluwarsa.index');
