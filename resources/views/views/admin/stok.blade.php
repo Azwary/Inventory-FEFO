@@ -18,55 +18,56 @@
 
         <!-- Tabel Stok Obat -->
         <div class="overflow-x-auto">
-            <table class="min-w-full border border-gray-300 table-auto">
+            <table class="min-w-full border border-gray-300 table-auto text-center">
                 <thead class="bg-gray-100">
                     <tr>
-                        <th class="border px-3 py-2 text-left">KODE</th>
-                        <th class="border px-3 py-2 text-left">NAMA OBAT</th>
-                        <th class="border px-3 py-2 text-left">BATCH</th>
-                        <th class="border px-3 py-2 text-left">TANGGAL MASUK</th>
-                        <th class="border px-3 py-2 text-left">TANGGAL EXP</th>
-                        <th class="border px-3 py-2 text-left">JUMLAH</th>
-                        <th class="border px-3 py-2 text-left">LOKASI</th>
-                        <th class="border px-3 py-2 text-left">AKSI</th>
+                        <th class="border px-3 py-2">KODE</th>
+                        <th class="border px-3 py-2">NAMA OBAT</th>
+                        <th class="border px-3 py-2">BATCH</th>
+                        <th class="border px-3 py-2">TANGGAL MASUK</th>
+                        <th class="border px-3 py-2">TANGGAL EXP</th>
+                        <th class="border px-3 py-2">JUMLAH</th>
+                        <th class="border px-3 py-2">LOKASI</th>
+                        <th class="border px-3 py-2">AKSI</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($stoks as $obat)
+                    @foreach ($stoks as $stok)
                         <tr class="hover:bg-gray-50">
-                            <td class="border px-3 py-2">{{ $obat->kode }}</td>
-                            <td class="border px-3 py-2">{{ $obat->nama_obat }}</td>
-                            <td class="border px-3 py-2">{{ $obat->batch }}</td>
-                            <td class="border px-3 py-2">{{ \Carbon\Carbon::parse($obat->tanggal_masuk)->format('d/m/Y') }}
+                            <td class="border px-3 py-2">{{ $stok->kode ?? '-' }}</td>
+                            <td class="border px-3 py-2">{{ $stok->barang->obat?->nama_obat ?? '-' }}</td>
+                            <td class="border px-3 py-2">{{ $stok->nomor_batch }}</td>
+                            <td class="border px-3 py-2">{{ \Carbon\Carbon::parse($stok->tanggal_masuk)->format('d/m/Y') }}
                             </td>
-                            <td class="border px-3 py-2">{{ \Carbon\Carbon::parse($obat->tanggal_exp)->format('d/m/Y') }}
+                            <td class="border px-3 py-2">{{ \Carbon\Carbon::parse($stok->tanggal_exp)->format('d/m/Y') }}
                             </td>
-                            <td class="border px-3 py-2">{{ $obat->jumlah }}</td>
-                            <td class="border px-3 py-2">{{ $obat->lokasi }}</td>
+                            <td class="border px-3 py-2">{{ $stok->jumlah ?? '-' }}</td>
+                            <td class="border px-3 py-2">{{ $stok->lokasi->nama_lokasi ?? '-' }}</td>
                             <td class="border px-3 py-2">
-                                <button type="button" onclick="openModal('detailModal{{ $obat->id_barang }}')"
+                                <button type="button" onclick="openModal('detailModal{{ $stok->id_barang }}')"
                                     class="text-blue-500 underline">Detail</button>
                             </td>
                         </tr>
 
                         <!-- Modal Detail Obat -->
-                        <div id="detailModal{{ $obat->id_barang }}"
+                        <div id="detailModal{{ $stok->id_barang }}"
                             class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
                             <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
-                                <h3 class="text-lg font-semibold mb-4">Detail Obat: {{ $obat->nama_obat }}</h3>
+                                <h3 class="text-lg font-semibold mb-4">Detail Obat:
+                                    {{ $stok->barang->obat?->nama_obat ?? '-' }}</h3>
                                 <ul class="mb-4 space-y-1">
-                                    <li><strong>Kode:</strong> {{ $obat->kode }}</li>
-                                    <li><strong>Batch:</strong> {{ $obat->batch }}</li>
+                                    <li><strong>Kode:</strong> {{ $stok->kode ?? '-' }}</li>
+                                    <li><strong>Batch:</strong> {{ $stok->nomor_batch ?? '-' }}</li>
                                     <li><strong>Tanggal Masuk:</strong>
-                                        {{ \Carbon\Carbon::parse($obat->tanggal_masuk)->format('d/m/Y') }}</li>
+                                        {{ \Carbon\Carbon::parse($stok->tanggal_masuk)->format('d/m/Y') }}</li>
                                     <li><strong>Tanggal Exp:</strong>
-                                        {{ \Carbon\Carbon::parse($obat->tanggal_exp)->format('d/m/Y') }}</li>
-                                    <li><strong>Jumlah:</strong> {{ $obat->jumlah }}</li>
-                                    <li><strong>Lokasi:</strong> {{ $obat->lokasi }}</li>
-                                    <li><strong>Satuan:</strong> {{ $obat->satuan->nama_satuan ?? '-' }}</li>
+                                        {{ \Carbon\Carbon::parse($stok->tanggal_exp)->format('d/m/Y') }}</li>
+                                    <li><strong>Jumlah:</strong> {{ $stok->jumlah ?? '-' }}</li>
+                                    <li><strong>Lokasi:</strong> {{ $stok->lokasi->nama_lokasi ?? '-' }}</li>
+                                    <li><strong>Satuan:</strong> {{ $stok->satuan->nama_satuan ?? '-' }}</li>
                                 </ul>
                                 <div class="flex justify-end">
-                                    <button type="button" onclick="closeModal('detailModal{{ $obat->id_barang }}')"
+                                    <button type="button" onclick="closeModal('detailModal{{ $stok->id_barang }}')"
                                         class="px-4 py-2 bg-gray-200 rounded">Tutup</button>
                                 </div>
                             </div>
@@ -168,65 +169,65 @@
                         @enderror
                     </div>
 
-                        <div class="mb-4">
-                            <label for="tanggal_masuk">Tanggal Masuk</label>
-                            <input type="date" name="tanggal_masuk" id="tanggal_masuk"
-                                class="border rounded px-3 py-2 w-full" value="{{ old('tanggal_masuk') }}" required>
-                            @error('tanggal_masuk')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="tanggal_exp">Tanggal Kedaluwarsa</label>
-                            <input type="date" name="tanggal_exp" id="tanggal_exp"
-                                class="border rounded px-3 py-2 w-full" value="{{ old('tanggal_exp') }}" required>
-                            @error('tanggal_exp')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="lokasi">Lokasi</label>
-                            <select name="lokasi" id="lokasi" class="border rounded px-3 py-2 w-full" required>
-                                <option value="" disabled selected>Pilih Lokasi..</option>
-                                @foreach ($lokasis as $lokasi)
-                                    <option value="{{ $lokasi->id_lokasi }}"
-                                        {{ old('lokasi') == $lokasi->id_lokasi ? 'selected' : '' }}>
-                                        {{ $lokasi->nama_lokasi }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('lokasi')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
+                    <div class="mb-4">
+                        <label for="tanggal_masuk">Tanggal Masuk</label>
+                        <input type="date" name="tanggal_masuk" id="tanggal_masuk"
+                            class="border rounded px-3 py-2 w-full" value="{{ old('tanggal_masuk') }}" required>
+                        @error('tanggal_masuk')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
 
-                    <div class="flex justify-end gap-2 mt-4">
-                        <button type="button" onclick="closeModal('addModal')"
-                            class="px-4 py-2 border rounded bg-gray-200">Batal</button>
-                        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Simpan</button>
+                    <div class="mb-4">
+                        <label for="tanggal_exp">Tanggal Kedaluwarsa</label>
+                        <input type="date" name="tanggal_exp" id="tanggal_exp"
+                            class="border rounded px-3 py-2 w-full" value="{{ old('tanggal_exp') }}" required>
+                        @error('tanggal_exp')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
-                </form>
-            </div>
+
+                    <div class="mb-4">
+                        <label for="lokasi">Lokasi</label>
+                        <select name="lokasi" id="lokasi" class="border rounded px-3 py-2 w-full" required>
+                            <option value="" disabled selected>Pilih Lokasi..</option>
+                            @foreach ($lokasis as $lokasi)
+                                <option value="{{ $lokasi->id_lokasi }}"
+                                    {{ old('lokasi') == $lokasi->id_lokasi ? 'selected' : '' }}>
+                                    {{ $lokasi->nama_lokasi }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('lokasi')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2 mt-4">
+                    <button type="button" onclick="closeModal('addModal')"
+                        class="px-4 py-2 border rounded bg-gray-200">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Simpan</button>
+                </div>
+            </form>
         </div>
+    </div>
 
-        <script>
-            function openModal(id) {
-                const modal = document.getElementById(id);
-                if (modal) {
-                    modal.classList.remove('hidden');
-                    modal.classList.add('flex');
-                }
+    <script>
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
             }
+        }
 
-            function closeModal(id) {
-                const modal = document.getElementById(id);
-                if (modal) {
-                    modal.classList.add('hidden');
-                    modal.classList.remove('flex');
-                }
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
             }
-        </script>
-    @endsection
+        }
+    </script>
+@endsection
