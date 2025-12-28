@@ -1,7 +1,8 @@
 <x-guest-layout>
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
-
+    <h1 class="text-2xl font-bold text-center">SELAMAT DATANG</h1>
+    <p class="text-center text-gray-500 mb-6">Silakan Login Untuk Melanjutkan</p>
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
@@ -42,7 +43,7 @@
 
         </div> --}}
         <x-primary-button class="flex justify-center mt-4 w-full">
-            {{ __('Log in') }}
+            {{ __('Masuk Sekarang') }}
         </x-primary-button>
     </form>
 </x-guest-layout>

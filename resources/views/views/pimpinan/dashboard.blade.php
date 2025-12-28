@@ -7,7 +7,8 @@
         <h2 class="text-xl font-semibold">Dashboard Utama (Tampilan Pimpinan)</h2>
     </div>
 
-    <div class="grid grid-cols-4 gap-4 mb-6">
+    <!-- Grid dashboard boxes responsif -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
         <x-dashboard-box>Box 1</x-dashboard-box>
         <x-dashboard-box>Box 2</x-dashboard-box>
         <x-dashboard-box>Box 3</x-dashboard-box>
@@ -20,7 +21,11 @@
             Grafik menunjukkan kecepatan pergerakan stok untuk mencegah kadaluarsa.
         </p>
 
-        <canvas id="fefoChart" height="80"></canvas>
+        <!-- Container chart responsif -->
+        <div class="w-full overflow-x-auto">
+            <canvas id="fefoChart" class="w-full" style="height: 300px;"></canvas>
+        </div>
+
 
         <div class="text-center mt-4">
             <a href="{{ route('pimpinan.laporan-audit.index') }}" class="text-blue-600 text-sm hover:underline">
@@ -28,12 +33,11 @@
             </a>
         </div>
     </div>
-
-
 @endsection
+
 @section('scripts')
     <script>
-        const ctx = document.getElementById('fefoChart');
+        const ctx = document.getElementById('fefoChart').getContext('2d');
 
         new Chart(ctx, {
             type: 'line',
@@ -43,19 +47,24 @@
                         label: 'Stok Keluar',
                         data: [30, 45, 40, 60, 55, 70],
                         borderWidth: 3,
-                        tension: 0.4
+                        tension: 0.4,
+                        borderColor: '#3B82F6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
                     },
                     {
                         label: 'Stok Hampir Expired',
                         data: [20, 30, 35, 25, 40, 30],
                         borderDash: [5, 5],
                         borderWidth: 2,
-                        tension: 0.4
+                        tension: 0.4,
+                        borderColor: '#EF4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
                     }
                 ]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false, // penting
                 plugins: {
                     legend: {
                         position: 'top'
@@ -63,7 +72,12 @@
                 },
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        min: 0,
+                        max: 100,
+                        ticks: {
+                            stepSize: 20
+                        }
                     }
                 }
             }
