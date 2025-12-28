@@ -8,9 +8,9 @@
 
 
     <div class="w-4/5 flex flex-col gap-4">
-        <a href="{{ route('admin.pengeluaran-obat.index') }}"
+        <a href="{{ route('admin.stok.index') }}"
             class="mb-2 text-black hover:bg-gray-200 px-4 py-2 border rounded block text-center">
-            Transaksi Obat Keluar
+            Persediaan / Stok Obat
         </a>
         <a href="{{ route('admin.pengeluaran-obat.index') }}"
             class="mb-2 text-black hover:bg-gray-200 px-4 py-2 border rounded block text-center">

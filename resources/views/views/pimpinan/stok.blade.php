@@ -20,10 +20,10 @@
         <div class="mb-4">
             <h3 class="font-semibold mb-2">Tampilan Rak Obat</h3>
             <div id="rakContainer" class="flex gap-4 overflow-x-auto no-scrollbar select-none cursor-grab">
-                @foreach ($raks as $rak)
+                @foreach ($stoks as $rak)
                     <div
                         class="flex-shrink-0 w-1/5 min-w-[150px] border rounded p-4 text-center bg-gray-50 flex flex-col justify-between">
-                        <div class="font-semibold">{{ $rak->nama }}</div>
+                        <div class="font-semibold">{{ $rak->lokasi?->nama_lokasi }}</div>
                         <div class="text-sm">{{ $rak->jumlah_item }} Item</div>
                         <div class="text-sm text-red-500">
                             @if ($rak->warning_item > 0)
@@ -53,37 +53,38 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($obats as $obat)
+                    @foreach ($stokss as $stok)
                         <tr class="hover:bg-gray-50">
-                            <td class="border px-3 py-2">{{ $obat->kode }}</td>
-                            <td class="border px-3 py-2">{{ $obat->nama_obat }}</td>
-                            <td class="border px-3 py-2">{{ $obat->batch }}</td>
-                            <td class="border px-3 py-2">{{ $obat->tanggal_masuk->format('d/m/Y') }}</td>
-                            <td class="border px-3 py-2">{{ $obat->tanggal_exp->format('d/m/Y') }}</td>
-                            <td class="border px-3 py-2">{{ $obat->jumlah }}</td>
-                            <td class="border px-3 py-2">{{ $obat->lokasi }}</td>
+                            <td class="border px-3 py-2">{{ $stok->id_stok ?? '-' }}</td>
+                            <td class="border px-3 py-2">{{ $stok->barang->obat?->nama_obat ?? '-' }}</td>
+                            <td class="border px-3 py-2">{{ $stok->nomor_batch ?? '-' }}</td>
+                            <td class="border px-3 py-2">{{ $stok->tanggal_masuk ?? '-' }}</td>
+                            <td class="border px-3 py-2">{{ $stok->tanggal_kadaluarsa ?? '-' }}</td>
+                            <td class="border px-3 py-2">{{ $stok->jumlah_masuk ?? '-' }}</td>
+                            <td class="border px-3 py-2">{{ $stok->lokasi->nama_lokasi ?? '-' }}</td>
                             <td class="border px-3 py-2">
-                                <button onclick="openModal('detailModal{{ $obat->id }}')"
+                                <button onclick="openModal('detailModal{{ $stok->id }}')"
                                     class="text-blue-500 underline">Detail</button>
                             </td>
                         </tr>
 
                         <!-- Modal Detail Obat -->
-                        <div id="detailModal{{ $obat->id }}"
+                        <div id="detailModal{{ $stok->id }}"
                             class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4">
                             <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
-                                <h3 class="text-lg font-semibold mb-4">Detail Obat: {{ $obat->nama_obat }}</h3>
+                                <h3 class="text-lg font-semibold mb-4">Detail Obat:
+                                    {{ $stok->barang->obat?->nama_obat ?? '-' }}</h3>
                                 <ul class="mb-4 space-y-1">
-                                    <li><strong>Kode:</strong> {{ $obat->kode }}</li>
-                                    <li><strong>Batch:</strong> {{ $obat->batch }}</li>
-                                    <li><strong>Tanggal Masuk:</strong> {{ $obat->tanggal_masuk->format('d/m/Y') }}</li>
-                                    <li><strong>Tanggal Exp:</strong> {{ $obat->tanggal_exp->format('d/m/Y') }}</li>
-                                    <li><strong>Jumlah:</strong> {{ $obat->jumlah }}</li>
-                                    <li><strong>Lokasi:</strong> {{ $obat->lokasi }}</li>
-                                    <li><strong>Satuan:</strong> {{ $obat->satuan ?? '-' }}</li>
+                                    <li><strong>Kode:</strong> {{ $stok->id_stok ?? '-' }}</li>
+                                    <li><strong>Batch:</strong> {{ $stok->nomor_batch ?? '-' }}</li>
+                                    <li><strong>Tanggal Masuk:</strong> {{ $stok->tanggal_masuk ?? '-' }}</li>
+                                    <li><strong>Tanggal Exp:</strong> {{ $stok->tanggal_kadaluarsa ?? '-' }}</li>
+                                    <li><strong>Jumlah:</strong> {{ $stok->jumlah_masuk ?? '-' }}</li>
+                                    <li><strong>Lokasi:</strong> {{ $stok->lokasi->nama_lokasi ?? '-' }}</li>
+                                    <li><strong>Satuan:</strong> {{ $stok->barang->satuan->nama_satuan ?? '-' }}</li>
                                 </ul>
                                 <div class="flex justify-end">
-                                    <button onclick="closeModal('detailModal{{ $obat->id }}')"
+                                    <button onclick="closeModal('detailModal{{ $stok->id }}')"
                                         class="px-4 py-2 bg-gray-200 rounded">Tutup</button>
                                 </div>
                             </div>

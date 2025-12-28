@@ -41,7 +41,7 @@
                             </td>
                             <td class="border px-3 py-2">{{ \Carbon\Carbon::parse($stok->tanggal_exp)->format('d/m/Y') }}
                             </td>
-                            <td class="border px-3 py-2">{{ $stok->jumlah ?? '-' }}</td>
+                            <td class="border px-3 py-2">{{ $stok->jumlah_masuk ?? '-' }}</td>
                             <td class="border px-3 py-2">{{ $stok->lokasi->nama_lokasi ?? '-' }}</td>
                             <td class="border px-3 py-2">
                                 <button type="button" onclick="openModal('detailModal{{ $stok->id_barang }}')"
@@ -62,9 +62,9 @@
                                         {{ \Carbon\Carbon::parse($stok->tanggal_masuk)->format('d/m/Y') }}</li>
                                     <li><strong>Tanggal Exp:</strong>
                                         {{ \Carbon\Carbon::parse($stok->tanggal_exp)->format('d/m/Y') }}</li>
-                                    <li><strong>Jumlah:</strong> {{ $stok->jumlah ?? '-' }}</li>
+                                    <li><strong>Jumlah:</strong> {{ $stok->jumlah_masuk ?? '-' }}</li>
                                     <li><strong>Lokasi:</strong> {{ $stok->lokasi->nama_lokasi ?? '-' }}</li>
-                                    <li><strong>Satuan:</strong> {{ $stok->satuan->nama_satuan ?? '-' }}</li>
+                                    <li><strong>Satuan:</strong> {{ $stok->barang->satuan->nama_satuan ?? '-' }}</li>
                                 </ul>
                                 <div class="flex justify-end">
                                     <button type="button" onclick="closeModal('detailModal{{ $stok->id_barang }}')"
