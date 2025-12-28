@@ -10,6 +10,11 @@ class Barang extends Model
     protected $primaryKey = 'id_barang';
     protected $guarded = [];
 
+
+    public function obat()
+    {
+        return $this->belongsTo(Obat::class, 'id_obat', 'id_obat');
+    }
     public function persediaan()
     {
         return $this->hasOne(Persediaan::class, 'id_barang');

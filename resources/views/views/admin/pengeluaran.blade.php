@@ -14,10 +14,17 @@
         <div class="flex gap-x-4 w-full mb-4">
             <div class="flex-1">
                 <label class="block font-medium mb-1" for="nama_obat">Nama Obat</label>
-                <select name="nama_obat" id="nama_obat" class="border rounded px-3 py-2 w-full mt-2">
-                    <option value="">Pilih Obat..</option>
-                    <option value="Null">Null</option>
+                <select name="nama_obat" id="nama_obat" class="border rounded px-3 py-2 w-full mt-2" required>
+                    <option value="" disabled selected>Pilih Obat..</option>
+                    @foreach ($stoks as $stok)
+                        <option value="{{ $stok->id_stok }}" {{ old('nama_obat') == $stok->id_stok ? 'selected' : '' }}>
+                            {{ $stok->barang->obat?->nama_obat ?? '-' }}
+                        </option>
+                    @endforeach
                 </select>
+                @error('nama_obat')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
             </div>
             <div class="flex-1">
                 <label class="block font-medium mb-1" for="jumlah_pengeluaran">Jumlah Pengeluaran</label>
