@@ -27,7 +27,8 @@
                         </svg>
                     </span>
                     <div class="w-full">
-                        <p class="font-semibold text-gray-800 truncate">{{ $notif->batch }} ({{ $notif->nama_obat }})</p>
+                        <p class="font-semibold text-gray-800 truncate">{{ $notif->nomor_batch ?? '-' }}
+                            ({{ $notif->barang->obat?->nama_obat ?? '-' }})</p>
                         <p class="text-sm text-gray-600">Sisa {{ $notif->sisa_hari }} hari. Segera keluarkan/diskon.</p>
                         <p class="text-sm text-gray-600">Sisa Stok {{ $notif->stok }}</p>
                     </div>
@@ -37,7 +38,7 @@
                 <div
                     class="flex flex-wrap sm:flex-nowrap items-center justify-between sm:justify-end gap-2 mt-3 sm:mt-0 w-full sm:w-auto">
                     <div class="text-sm font-semibold text-gray-700 sm:mr-4 whitespace-nowrap">
-                        Exp: <span class="text-red-500">{{ $notif->exp_date->format('d M Y') }}</span>
+                        Exp: <span class="text-red-500">{{ $notif->tanggal_kadaluarsa ?? '-' }}</span>
                     </div>
                     <div class="flex gap-2">
                         <button class="p-2 bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors"

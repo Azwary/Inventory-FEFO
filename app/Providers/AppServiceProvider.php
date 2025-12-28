@@ -6,7 +6,7 @@ use App\Models\StokBarang;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
-
+use Carbon\Carbon;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,13 +23,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        View::composer('*', function ($view) {
-            $notifications = StokBarang::select('*')
-                ->whereNotNull('tanggal_kadaluarsa')
-                ->where('tanggal_kadaluarsa', '<=', now()->addDays(30))
-                ->where('tanggal_kadaluarsa', '>=', now())
-                ->get();
 
+        View::composer('*', function ($view) {
+            $notifications = StokBarang::select(
+                '*',
+                \DB::raw('DATEDIFF(tanggal_kadaluarsa, CURDATE()) AS sisa_hari')
+            )
+                ->whereNotNull('tanggal_kadaluarsa')
+                ->whereBetween('tanggal_kadaluarsa', [now(), now()->addDays(30)])
+                ->get();
 
             $view->with('notifications', $notifications);
         });

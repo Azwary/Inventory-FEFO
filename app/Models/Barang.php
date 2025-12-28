@@ -15,6 +15,11 @@ class Barang extends Model
     {
         return $this->belongsTo(Obat::class, 'id_obat', 'id_obat');
     }
+    public function satuan()
+    {
+        return $this->belongsTo(Satuan::class, 'id_satuan', 'id_satuan');
+    }
+
     public function persediaan()
     {
         return $this->hasOne(Persediaan::class, 'id_barang');
