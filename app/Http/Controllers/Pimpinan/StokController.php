@@ -43,8 +43,16 @@ class StokController extends Controller
                 'lokasi' => 'Gudang A',
             ],
         ]);
-
-        return view('views.pimpinan.stok', compact('obats'));
+        $raks = [
+            (object)['nama' => 'RAK A1', 'jumlah_item' => 101, 'warning_item' => 4],
+            (object)['nama' => 'RAK A1', 'jumlah_item' => 0, 'warning_item' => 0],
+            (object)['nama' => 'RAK A1', 'jumlah_item' => 10, 'warning_item' => 0],
+            (object)['nama' => 'RAK A1', 'jumlah_item' => 10, 'warning_item' => 0],
+            (object)['nama' => 'RAK A1', 'jumlah_item' => 10, 'warning_item' => 0],
+            (object)['nama' => 'RAK A1', 'jumlah_item' => 10, 'warning_item' => 0],
+            (object)['nama' => 'RAK A1', 'jumlah_item' => 10, 'warning_item' => 0],
+        ];
+        return view('views.pimpinan.stok', compact('obats', 'raks'));
     }
 
     // Menampilkan detail obat berdasarkan id
