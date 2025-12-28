@@ -10,14 +10,15 @@
                         <path d="M12 17h.01" />
                     </svg></span>
                 <div>
-                    <p class="font-semibold">{{ $notif->batch }} ({{ $notif->nama_obat }})</p>
+                    <p class="font-semibold">{{ $notif->nomor_batch }} ({{ $notif->nama_obat }})</p>
                     <p class="text-sm">
                         Sisa {{ $notif->sisa_hari }} hari. Segera keluarkan/diskon.
                     </p>
                 </div>
             </div>
             <div class="text-sm font-semibold">
-                Exp: <span class="text-red-500">{{ $notif->exp_date->format('d M Y') }}</span>
+                Exp: <span class="text-red-500">{{ optional($notif->tanggal_kadaluarsa)->format('d M Y') ?? '-' }}
+                </span>
             </div>
         </div>
     @endforeach

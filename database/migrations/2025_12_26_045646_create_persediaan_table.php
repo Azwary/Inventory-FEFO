@@ -12,11 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('persediaan', function (Blueprint $table) {
-            $table->id('id_persediaan');
-            $table->string('id_barang', 5);
-            $table->integer('stok')->default(0);
-
-            $table->foreign('id_barang')->references('id_barang')->on('barang')->onDelete('cascade');
+            $table->string('id_persediaan', 5)->primary();
+            $table->integer('stok_barang')->default(0);
+            $table->integer('stok_minimum')->nullable();
             $table->timestamps();
         });
     }

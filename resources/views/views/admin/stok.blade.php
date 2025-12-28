@@ -34,7 +34,7 @@
                 <tbody>
                     @foreach ($stoks as $stok)
                         <tr class="hover:bg-gray-50">
-                            <td class="border px-3 py-2">{{ $stok->kode ?? '-' }}</td>
+                            <td class="border px-3 py-2">{{ $stok->id_stok ?? '-' }}</td>
                             <td class="border px-3 py-2">{{ $stok->barang->obat?->nama_obat ?? '-' }}</td>
                             <td class="border px-3 py-2">{{ $stok->nomor_batch }}</td>
                             <td class="border px-3 py-2">{{ \Carbon\Carbon::parse($stok->tanggal_masuk)->format('d/m/Y') }}
@@ -56,7 +56,7 @@
                                 <h3 class="text-lg font-semibold mb-4">Detail Obat:
                                     {{ $stok->barang->obat?->nama_obat ?? '-' }}</h3>
                                 <ul class="mb-4 space-y-1">
-                                    <li><strong>Kode:</strong> {{ $stok->kode ?? '-' }}</li>
+                                    <li><strong>Kode:</strong> {{ $stok->id_stok ?? '-' }}</li>
                                     <li><strong>Batch:</strong> {{ $stok->nomor_batch ?? '-' }}</li>
                                     <li><strong>Tanggal Masuk:</strong>
                                         {{ \Carbon\Carbon::parse($stok->tanggal_masuk)->format('d/m/Y') }}</li>
@@ -103,14 +103,14 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="mb-4">
+                    {{-- <div class="mb-4">
                         <label for="batch">Nomor Batch</label>
                         <input type="text" name="batch" id="batch" class="border rounded px-3 py-2 w-full"
                             placeholder="Contoh: NB001" value="{{ old('batch') }}" required>
                         @error('batch')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
-                    </div>
+                    </div> --}}
 
                     <div class="mb-4">
                         <label for="jumlah">Jumlah Masuk</label>
