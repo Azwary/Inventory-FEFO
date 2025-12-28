@@ -8,6 +8,7 @@ use App\Models\Jenis;
 use App\Models\Kategori;
 use App\Models\Lokasi;
 use App\Models\Obat;
+use App\Models\Persediaan;
 use App\Models\Satuan;
 use App\Models\StokBarang;
 use App\Models\TrBarangMasuk;
@@ -17,7 +18,8 @@ use Illuminate\Support\Facades\Auth;
 
 class StokController extends Controller
 {
-    // Menampilkan list stok obat
+
+
     public function index()
     {
         $stoks = StokBarang::with(['obat', 'jenis', 'kategori', 'satuan'])->get();
@@ -31,7 +33,6 @@ class StokController extends Controller
         return view('views.admin.stok', compact('stoks', 'obats', 'jeniss', 'kategoris', 'satuans', 'lokasis'));
     }
 
-    // Form tambah stok
     public function create()
     {
         $obats = Obat::select('id_obat', 'nama_obat')->get();
@@ -44,12 +45,30 @@ class StokController extends Controller
         return view('views.admin.stok', compact('obats', 'jeniss', 'kategoris', 'satuans', 'lokasis'));
     }
 
-    // Simpan stok baru
+
+    private function generateId($model, $prefix, $length)
+    {
+        $primaryKey = $model->getKeyName(); // ambil nama kolom PK otomatis
+
+        // Gunakan backtick agar MySQL mengenali kolom
+        $last = $model::orderByRaw(
+            "CAST(SUBSTRING(`$primaryKey`, " . (strlen($prefix) + 1) . ") AS UNSIGNED) DESC"
+        )->first();
+
+        $number = $last ? (int) substr($last->{$primaryKey}, strlen($prefix)) + 1 : 1;
+
+        do {
+            $id = $prefix . str_pad($number, $length, '0', STR_PAD_LEFT);
+            $exists = $model::where($primaryKey, $id)->exists();
+            if ($exists) $number++;
+        } while ($exists);
+
+        return $id;
+    }
     public function store(Request $request)
     {
         $request->validate([
             'nama_obat' => 'required|exists:obat,id_obat',
-            'batch' => 'required|string|max:50',
             'jumlah' => 'required|integer|min:1',
             'jenis' => 'required|exists:jenis,id_jenis',
             'satuan' => 'required|exists:satuan,id_satuan',
@@ -58,65 +77,63 @@ class StokController extends Controller
             'lokasi' => 'required|exists:lokasi,id_lokasi',
         ]);
 
-        // ID Barang
-        $lastBarang = Barang::orderBy('id_barang', 'desc')->first();
-        $newNumber = $lastBarang ? (int) substr($lastBarang->id_barang, 2) + 1 : 1;
-        $Idbarang = 'BR' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
+        // Generate semua ID unik
+        $IdBarang = $this->generateId(new Barang(), 'BR', 3);
+        $NoBatch = $this->generateId(new StokBarang(), 'NB', 3);
+        $IdStok = $this->generateId(new StokBarang(), 'STB', 2);
+        $IdBarangMasuk = $this->generateId(new BarangMasuk(), 'BRM', 2);
+        $IdTrBarangMasuk = $this->generateId(new TrBarangMasuk(), 'TR', 3);
+        $IdPersediaan = $this->generateId(new Persediaan(), 'PR', 3);
 
+        // 1. Barang
         $barangData = [
-            'id_barang' => $Idbarang,
+            'id_barang' => $IdBarang,
             'id_obat' => $request->nama_obat,
             'id_jenis' => $request->jenis,
             'id_kategori' => $request->kategori,
             'id_satuan' => $request->satuan,
             'id_lokasi' => $request->lokasi,
         ];
-        // dd('Barang:', $barangData);
         Barang::create($barangData);
 
-        // ID Stok
-        $lastStok = StokBarang::orderBy('id_stok', 'desc')->first();
-        $newNumber = $lastStok ? (int) substr($lastStok->id_stok, 2) + 1 : 1;
-        $IdStok = 'ST' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
-
+        // 2. Stok Barang
         $stokData = [
             'id_stok' => $IdStok,
-            'id_barang' => $Idbarang,
+            'id_barang' => $IdBarang,
             'id_lokasi' => $request->lokasi,
-            'nomor_batch' => $request->batch,
+            'nomor_batch' => $NoBatch,
             'tanggal_masuk' => $request->tanggal_masuk,
             'tanggal_kadaluarsa' => $request->tanggal_exp,
             'jumlah_masuk' => $request->jumlah,
         ];
-        // dd('StokBarang:', $stokData);
         StokBarang::create($stokData);
 
-        // BarangMasuk
-        $lastBarang = Barang::orderBy('id_barang', 'desc')->first();
-        $newNumber = $lastBarang ? (int) substr($lastBarang->id_barang, 2) + 1 : 1;
-        $Idbarang = 'BR' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
-
+        // 3. Barang Masuk
         $barangMasukData = [
-            'id_masuk' => $request->batch,
-            'id_barang' => $Idbarang,
+            'id_masuk' => $IdBarangMasuk,
+            'id_barang' => $IdBarang,
+            'tanggal_masuk' => $request->tanggal_masuk,
             'id_user' => Auth::user()->id,
-            'jumlah' => $request->jumlah,
         ];
-        dd('BarangMasuk:', $barangMasukData);
         BarangMasuk::create($barangMasukData);
 
-        // TrBarangMasuk
-        $lastTrMasuk = TrBarangMasuk::orderBy('id_tr_masuk', 'desc')->first();
-        $newNumber = $lastTrMasuk ? (int) substr($lastTrMasuk->id_tr_masuk, 2) + 1 : 1;
-        $IdTrMasuk = 'TR' . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
-
+        // 4. TrBarangMasuk
         $trMasukData = [
-            'barang_id' => $IdTrMasuk,
-            'jumlah' => $request->jumlah,
-            'tanggal_masuk' => $request->tanggal_masuk,
+            'id_tr_masuk' => $IdTrBarangMasuk,
+            'jml_barang_masuk' => $request->jumlah,
         ];
-        dd('TrBarangMasuk:', $trMasukData);
         TrBarangMasuk::create($trMasukData);
+
+        // 5. Persediaan
+        $lastPersediaan = Persediaan::orderBy('id_persediaan', 'desc')->first();
+        $stokLama = $lastPersediaan ? $lastPersediaan->stok_barang : 0;
+        $stokBaru = $stokLama + $request->jumlah;
+
+        $persediaanData = [
+            'id_persediaan' => $IdPersediaan,
+            'stok_barang' => $stokBaru,
+        ];
+        Persediaan::create($persediaanData);
 
         return redirect()->route('admin.stok.index')->with('success', 'Stok obat berhasil ditambahkan.');
     }
