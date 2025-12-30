@@ -46,8 +46,11 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/stok', [StokController::class, 'store'])->name('stok.store');
     Route::get('/stok/{id}', [StokController::class, 'show'])->name('obat.show');
     Route::get('/pengeluaran', [PengeluaranController::class, 'index'])->name('pengeluaran-obat.index');
+    Route::post('/pengeluaran', [PengeluaranController::class, 'store'])->name('pengeluaran-obat.store');
     Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi-kedaluwarsa.index');
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan-audit.index');
+    Route::get('/laporan/export/csv', [LaporanController::class, 'exportCsv'])->name('laporan-audit.export.csv');
+    Route::get('/laporan/export/pdf', [LaporanController::class, 'exportPdf'])->name('laporan-audit.export.pdf');
 });
 
 
@@ -58,6 +61,8 @@ Route::middleware(['auth', 'role:Pimpinan'])->prefix('pimpinan')->name('pimpinan
     Route::get('/stok/{id}', [PimpinanStokController::class, 'show'])->name('obat.show');
     Route::get('/notifikasi', [PimpinanNotifikasiController::class, 'index'])->name('notifikasi-kedaluwarsa.index');
     Route::get('/laporan', [PimpinanLaporanController::class, 'index'])->name('laporan-audit.index');
+    Route::get('/laporan/export/csv', [PimpinanLaporanController::class, 'exportCsv'])->name('laporan-audit.export.csv');
+    Route::get('/laporan/export/pdf', [PimpinanLaporanController::class, 'exportPdf'])->name('laporan-audit.export.pdf');
 });
 
 Route::get('/test', function () {

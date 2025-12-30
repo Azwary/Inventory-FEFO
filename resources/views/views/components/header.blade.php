@@ -1,15 +1,14 @@
 <header class="bg-white px-6 py-4 border-b flex items-center justify-between md:justify-between">
-    <!-- Tombol Hamburger Mobile -->
+
     <button @click="sidebarOpen = !sidebarOpen" class="md:hidden text-gray-700 focus:outline-none mr-4">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
     </button>
 
-    <!-- Input Search -->
     <input type="text" placeholder="Cari obat, Batch atau Laporan..." class="px-4 py-2 w-1/2 border rounded">
 
-    <!-- Notifikasi & User -->
+
     <div class="flex items-center space-x-4">
         @php
             $routeNotif =
@@ -43,7 +42,7 @@
             </button>
         @endif
 
-        <!-- User -->
+
         <div class="flex items-center gap-2">
             <i class="bi bi-person-circle text-3xl"></i>
             <div class="flex flex-col">
