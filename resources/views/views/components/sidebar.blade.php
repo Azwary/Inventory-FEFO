@@ -1,4 +1,3 @@
-<!-- Overlay untuk menutup sidebar saat mobile -->
 <div x-show="sidebarOpen" @click="sidebarOpen = false" class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
     x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
     x-transition:enter-end="opacity-50" x-transition:leave="transition ease-in duration-300"
@@ -7,11 +6,9 @@
 <aside :class="{ 'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen }"
     class="fixed inset-y-0 left-0 w-64 bg-white shadow-lg flex flex-col h-full transform transition-transform duration-300 md:translate-x-0 md:static md:h-screen z-50">
 
-    <!-- Header Sidebar + Tombol Close -->
     <div class="p-4 flex items-center justify-between border-b">
         <span class="font-bold text-lg">Inventori FEFO</span>
 
-        <!-- Tombol Close hanya muncul di mobile -->
         <button @click="sidebarOpen = false" class="md:hidden text-gray-700 focus:outline-none">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

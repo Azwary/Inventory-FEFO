@@ -3,8 +3,9 @@
 @section('title', 'Notifikasi Kekadaluarsaan')
 
 @section('content')
-    <div class="p-6 bg-white rounded-lg shadow mb-4">
-        <h2 class="text-xl font-semibold">Notifikasi Kekadaluarsaan</h2>
+    <div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg shadow text-white mb-6">
+        <h2 class="text-2xl font-bold">Notifikasi Kekadaluarsaan</h2>
+        <p class="text-sm opacity-90">Informasi Kekadaluarsaan Obat</p>
     </div>
 
     <div class="p-6 bg-white rounded-lg shadow mb-4">
@@ -14,7 +15,6 @@
             <div
                 class="flex flex-col sm:flex-row sm:items-center justify-between mb-3 p-4 border rounded-lg gap-4 sm:gap-0 hover:shadow-sm transition-shadow">
 
-                <!-- Bagian kiri: ikon + info -->
                 <div class="flex items-start sm:items-center space-x-3 w-full sm:w-2/3">
                     <span class="flex-shrink-0">
                         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
@@ -31,17 +31,16 @@
                             ({{ $notif->barang->obat?->nama_obat ?? '-' }})
                         </p>
                         <p class="text-sm text-gray-600">Sisa {{ $notif->sisa_hari }} hari. Segera keluarkan/diskon.</p>
-                        <p class="text-sm text-gray-600">Sisa Stok {{ $notif->stok }}</p>
+                        <p class="text-sm text-gray-600">Sisa Stok {{ $notif->jumlah_masuk }}</p>
                     </div>
                 </div>
 
-                <!-- Bagian kanan: Exp + tombol -->
                 <div
                     class="flex flex-wrap sm:flex-nowrap items-center justify-between sm:justify-end gap-2 mt-3 sm:mt-0 w-full sm:w-auto">
                     <div class="text-sm font-semibold text-gray-700 sm:mr-4 whitespace-nowrap">
                         Exp: <span class="text-red-500">{{ $notif->tanggal_kadaluarsa ?? '-' }}</span>
                     </div>
-                    <div class="flex gap-2">
+                    {{-- <div class="flex gap-2">
                         <button class="p-2 bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors"
                             title="Hapus">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
@@ -62,7 +61,7 @@
                                     d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z" />
                             </svg>
                         </button>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
         @endforeach

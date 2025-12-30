@@ -7,6 +7,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,7 +28,7 @@ class AppServiceProvider extends ServiceProvider
         View::composer('*', function ($view) {
             $notifications = StokBarang::select(
                 '*',
-                \DB::raw('DATEDIFF(tanggal_kadaluarsa, CURDATE()) AS sisa_hari')
+                DB::raw('DATEDIFF(tanggal_kadaluarsa, CURDATE()) AS sisa_hari')
             )
                 ->whereNotNull('tanggal_kadaluarsa')
                 ->whereBetween('tanggal_kadaluarsa', [now(), now()->addDays(30)])

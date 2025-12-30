@@ -1,3 +1,3 @@
-<div class="bg-white p-4 rounded shadow h-32 flex items-center justify-center">
+<div class="bg-white rounded-xl shadow-sm">
     {{ $slot }}
 </div>

@@ -15,22 +15,65 @@ use App\Models\TrBarangMasuk;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class StokController extends Controller
 {
 
-
-    public function index()
+    public function index(Request $request)
     {
-        $stoks = StokBarang::with(['obat', 'jenis', 'kategori', 'satuan'])->get();
+        $orderExp = $request->get('exp', 'asc');
+        $search   = $request->get('search');
+
+        $rakStoks = StokBarang::select(
+            'id_lokasi',
+            DB::raw('COUNT(*) AS jumlah_item'),
+            DB::raw("
+                SUM(
+                    CASE
+                        WHEN tanggal_kadaluarsa IS NOT NULL
+                        AND tanggal_kadaluarsa BETWEEN CURDATE()
+                        AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)
+                        THEN 1 ELSE 0
+                    END
+                ) AS warning_item
+            ")
+        )
+            ->with('lokasi')
+            ->groupBy('id_lokasi')
+            ->get();
+
+        $stoks = StokBarang::with([
+            'obat',
+            'jenis',
+            'kategori',
+            'satuan',
+            'lokasi'
+        ])
+            ->when($search, function ($query) use ($search) {
+                $query->whereHas('obat', function ($q) use ($search) {
+                    $q->where('nama_obat', 'like', "%{$search}%");
+                })
+                    ->orWhere('nomor_batch', 'like', "%{$search}%");
+            })
+            ->orderBy('tanggal_kadaluarsa', $orderExp)
+            ->get();
+
         $obats = Obat::select('id_obat', 'nama_obat')->get();
         $jeniss = Jenis::select('id_jenis', 'nama_jenis')->get();
         $kategoris = Kategori::select('id_kategori', 'nama_kategori')->get();
         $satuans = Satuan::select('id_satuan', 'nama_satuan')->get();
         $lokasis = Lokasi::select('id_lokasi', 'nama_lokasi')->get();
 
-
-        return view('views.admin.stok', compact('stoks', 'obats', 'jeniss', 'kategoris', 'satuans', 'lokasis'));
+        return view('views.admin.stok', compact(
+            'rakStoks',
+            'stoks',
+            'obats',
+            'jeniss',
+            'kategoris',
+            'satuans',
+            'lokasis'
+        ));
     }
 
     public function create()
@@ -46,46 +89,46 @@ class StokController extends Controller
     }
 
 
-    private function generateId($model, $prefix, $length)
+    private function generateId($model, $column, $prefix, $length)
     {
-        $primaryKey = $model->getKeyName(); // ambil nama kolom PK otomatis
-
-        // Gunakan backtick agar MySQL mengenali kolom
         $last = $model::orderByRaw(
-            "CAST(SUBSTRING(`$primaryKey`, " . (strlen($prefix) + 1) . ") AS UNSIGNED) DESC"
+            "CAST(SUBSTRING(`$column`, " . (strlen($prefix) + 1) . ") AS UNSIGNED) DESC"
         )->first();
 
-        $number = $last ? (int) substr($last->{$primaryKey}, strlen($prefix)) + 1 : 1;
+        $number = $last ? (int) substr($last->{$column}, strlen($prefix)) + 1 : 1;
 
         do {
             $id = $prefix . str_pad($number, $length, '0', STR_PAD_LEFT);
-            $exists = $model::where($primaryKey, $id)->exists();
+            $exists = $model::where($column, $id)->exists();
             if ($exists) $number++;
         } while ($exists);
 
         return $id;
     }
+
     public function store(Request $request)
     {
         $request->validate([
             'nama_obat' => 'required|exists:obat,id_obat',
             'jumlah' => 'required|integer|min:1',
             'jenis' => 'required|exists:jenis,id_jenis',
+            'kategori' => 'required|exists:kategori,id_kategori',
             'satuan' => 'required|exists:satuan,id_satuan',
             'tanggal_masuk' => 'required|date',
             'tanggal_exp' => 'required|date|after_or_equal:tanggal_masuk',
             'lokasi' => 'required|exists:lokasi,id_lokasi',
         ]);
 
-        // Generate semua ID unik
-        $IdBarang = $this->generateId(new Barang(), 'BR', 3);
-        $NoBatch = $this->generateId(new StokBarang(), 'NB', 3);
-        $IdStok = $this->generateId(new StokBarang(), 'STB', 2);
-        $IdBarangMasuk = $this->generateId(new BarangMasuk(), 'BRM', 2);
-        $IdTrBarangMasuk = $this->generateId(new TrBarangMasuk(), 'TR', 3);
-        $IdPersediaan = $this->generateId(new Persediaan(), 'PR', 3);
+        $IdBarang        = $this->generateId(new Barang(), 'id_barang', 'BR', 3);
+        $IdStok          = $this->generateId(new StokBarang(), 'id_stok', 'STB', 2);
+        $IdBarangMasuk   = $this->generateId(new BarangMasuk(), 'id_masuk', 'BRM', 2);
+        $IdTrBarangMasuk = $this->generateId(new TrBarangMasuk(), 'id_tr_masuk', 'TR', 3);
+        $IdPersediaan    = $this->generateId(new Persediaan(), 'id_persediaan', 'PR', 3);
 
-        // 1. Barang
+        $NoBatch = $this->generateId(new StokBarang(), 'nomor_batch', 'NB', 3);
+
+
+
         $barangData = [
             'id_barang' => $IdBarang,
             'id_obat' => $request->nama_obat,
@@ -96,7 +139,7 @@ class StokController extends Controller
         ];
         Barang::create($barangData);
 
-        // 2. Stok Barang
+
         $stokData = [
             'id_stok' => $IdStok,
             'id_barang' => $IdBarang,
@@ -108,7 +151,7 @@ class StokController extends Controller
         ];
         StokBarang::create($stokData);
 
-        // 3. Barang Masuk
+
         $barangMasukData = [
             'id_masuk' => $IdBarangMasuk,
             'id_barang' => $IdBarang,
@@ -117,14 +160,14 @@ class StokController extends Controller
         ];
         BarangMasuk::create($barangMasukData);
 
-        // 4. TrBarangMasuk
+
         $trMasukData = [
             'id_tr_masuk' => $IdTrBarangMasuk,
             'jml_barang_masuk' => $request->jumlah,
         ];
         TrBarangMasuk::create($trMasukData);
 
-        // 5. Persediaan
+
         $lastPersediaan = Persediaan::orderBy('id_persediaan', 'desc')->first();
         $stokLama = $lastPersediaan ? $lastPersediaan->stok_barang : 0;
         $stokBaru = $stokLama + $request->jumlah;
@@ -138,21 +181,20 @@ class StokController extends Controller
         return redirect()->route('admin.stok.index')->with('success', 'Stok obat berhasil ditambahkan.');
     }
 
-    // Controller sementara
+
     // public function store(Request $request)
     // {
     //     return response()->json($request->all());
     // }
 
 
-    // Tampilkan detail stok
     public function show($id)
     {
         $stok = Barang::with(['obat', 'jenis', 'satuan'])->findOrFail($id);
         return view('views.admin.sto', compact('stok'));
     }
 
-    // Form edit stok
+
     public function edit($id)
     {
         $stok = Barang::findOrFail($id);
@@ -163,7 +205,7 @@ class StokController extends Controller
         return view('views.admin.sto', compact('stok', 'obats', 'jeniss', 'satuans'));
     }
 
-    // Update stok
+
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -192,7 +234,7 @@ class StokController extends Controller
         return redirect()->route('views.admin.stok')->with('success', 'Stok obat berhasil diupdate.');
     }
 
-    // Hapus stok
+
     public function destroy($id)
     {
         $stok = Barang::findOrFail($id);
