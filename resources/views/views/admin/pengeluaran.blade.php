@@ -23,9 +23,10 @@
                     <select name="nama_obat" id="nama_obat" class="border rounded px-3 py-2 w-full mt-2" required>
                         <option value="" disabled selected>Pilih Obat..</option>
                         @foreach ($stoks as $stok)
-                            <option value="{{ $stok->id_stok }}" data-stok="{{ $stok->jumlah_masuk }}"
-                                data-batch="{{ $stok->nomor_batch }}" data-exp="{{ $stok->tanggal_kadaluarsa }}"
-                                {{ old('nama_obat') == $stok->id_stok ? 'selected' : '' }}>
+                            <option value="{{ $stok->id_stok }}"
+                                data-nama="{{ optional($stok->barang)->obat?->nama_obat ?? '-' }}"
+                                data-stok="{{ $stok->jumlah_masuk }}" data-batch="{{ $stok->nomor_batch }}"
+                                data-exp="{{ $stok->tanggal_kadaluarsa }}">
                                 {{ optional($stok->barang)->obat?->nama_obat ?? '-' }}
                                 (Exp: {{ $stok->tanggal_kadaluarsa }})
                             </option>
@@ -66,6 +67,10 @@
                 <b id="info-exp">-</b>
             </div>
 
+            <small class="mt-1 block ">
+                <p class="font-bold text-base">Batch Rekomendasi FEFO:</p>
+                <span id="rekomendasi-obat" class="font-semibold">-</span>
+            </small>
 
             <div class="flex justify-end mt-4">
                 <button type="submit" class="border rounded px-4 py-2 bg-blue-500 text-white hover:bg-blue-600">
@@ -82,6 +87,42 @@
         const batchText = document.getElementById('info-batch');
         const expText = document.getElementById('info-exp');
         const jumlahInput = document.getElementById('jumlah_pengeluaran');
+        const rekomendasiText = document.getElementById('rekomendasi-obat');
+
+        function getRekomendasiFEFO() {
+            const today = new Date();
+            let kandidat = null;
+            let selisihTerkecil = Infinity;
+
+            Array.from(obatSelect.options).forEach(option => {
+                if (!option.dataset.exp) return;
+
+                const expDate = new Date(option.dataset.exp);
+                const diffTime = expDate - today;
+                const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+                if (diffDays >= 0 && diffDays <= 30) {
+                    if (diffDays < selisihTerkecil) {
+                        selisihTerkecil = diffDays;
+                        kandidat = option;
+                    }
+                }
+            });
+
+            if (kandidat) {
+                rekomendasiText.innerHTML =
+                    kandidat.dataset.batch + " - " +
+                    kandidat.dataset.nama + "<br>" +
+                    "Tgl Kadaluarsa: <span class='text-red-600'>" +
+                    kandidat.dataset.exp +
+                    "</span>" +
+                    "<br>" + "Sisa Stok Batch : " +
+                    kandidat.dataset.stok + "";
+            } else {
+                rekomendasiText.innerText = 'Tidak ada batch FEFO dalam 30 hari';
+            }
+
+        }
 
         obatSelect.addEventListener('change', function() {
             const option = this.options[this.selectedIndex];
@@ -96,5 +137,9 @@
 
             jumlahInput.max = stok;
         });
+
+        getRekomendasiFEFO();
     </script>
+
+
 @endsection
