@@ -39,7 +39,7 @@ class LaporanController extends Controller
             $q->whereBetween('created_at', [$dari, $sampai])
         )->get();
 
-        return view('views.pimpinan.laporan', [
+        return view('views.admin.laporan', [
             'stokAktif'   => $stokAktif,
             'totalBatch' => $stokAktif->count(),
             'totalStok'  => $stokAktif->sum('jumlah_masuk'),
@@ -110,7 +110,7 @@ class LaporanController extends Controller
             ->orderBy('tanggal_kadaluarsa')
             ->get();
 
-        return Pdf::loadView('views.pimpinan.laporan_pdf', [
+        return Pdf::loadView('views.admin.laporan_pdf', [
             'stokAktif' => $stokAktif,
             'dari' => $dari,
             'sampai' => $sampai
