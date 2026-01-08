@@ -278,6 +278,144 @@
         </div>
     </div>
 
+    <div id="addModal"
+        class="fixed inset-0 bg-black/60 hidden items-start justify-center overflow-auto p-4 z-50 backdrop-blur-sm">
+
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl mt-10 overflow-hidden animate-fade-in">
+
+            <!-- HEADER -->
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4 text-white">
+                <h3 class="text-xl font-bold flex items-center gap-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M12 4v16m8-8H4" />
+                    </svg>
+                    Tambah Stok Obat
+                </h3>
+                <p class="text-sm opacity-90 mt-1">
+                    Input data obat masuk ke gudang
+                </p>
+            </div>
+
+            <!-- BODY -->
+            <form action="{{ route('admin.stok.store') }}" method="POST" class="p-6 space-y-5">
+                @csrf
+
+                <!-- NAMA OBAT -->
+                <div>
+                    <label for="nama_obat" class="block text-sm font-semibold mb-1">
+                        Nama Obat
+                    </label>
+                    <select name="nama_obat" id="nama_obat"
+                        class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        required>
+                        <option value="" disabled selected>Pilih Obat..</option>
+                        @foreach ($obats as $obat)
+                            <option value="{{ $obat->id_obat }}"
+                                {{ old('nama_obat') == $obat->id_obat ? 'selected' : '' }}>
+                                {{ $obat->nama_obat }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('nama_obat')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- GRID FORM -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Jumlah Masuk</label>
+                        <input type="number" name="jumlah" value="{{ old('jumlah') }}"
+                            class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500" required>
+                        @error('jumlah')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Satuan</label>
+                        <select name="satuan" class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500"
+                            required>
+                            <option value="" disabled selected>Pilih Satuan..</option>
+                            @foreach ($satuans as $satuan)
+                                <option value="{{ $satuan->id_satuan }}"
+                                    {{ old('satuan') == $satuan->id_satuan ? 'selected' : '' }}>
+                                    {{ $satuan->nama_satuan }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Jenis</label>
+                        <select name="jenis" class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500"
+                            required>
+                            <option value="" disabled selected>Pilih Jenis..</option>
+                            @foreach ($jeniss as $jenis)
+                                <option value="{{ $jenis->id_jenis }}"
+                                    {{ old('jenis') == $jenis->id_jenis ? 'selected' : '' }}>
+                                    {{ $jenis->nama_jenis }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Kategori</label>
+                        <select name="kategori" class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500"
+                            required>
+                            <option value="" disabled selected>Pilih Kategori..</option>
+                            @foreach ($kategoris as $kategori)
+                                <option value="{{ $kategori->id_kategori }}"
+                                    {{ old('kategori') == $kategori->id_kategori ? 'selected' : '' }}>
+                                    {{ $kategori->nama_kategori }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Tanggal Masuk</label>
+                        <input type="date" name="tanggal_masuk" value="{{ old('tanggal_masuk') }}"
+                            class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Tanggal Kedaluwarsa</label>
+                        <input type="date" name="tanggal_exp" value="{{ old('tanggal_exp') }}"
+                            class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold mb-1">Lokasi</label>
+                        <select name="lokasi" class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500"
+                            required>
+                            <option value="" disabled selected>Pilih Lokasi..</option>
+                            @foreach ($lokasis as $lokasi)
+                                <option value="{{ $lokasi->id_lokasi }}"
+                                    {{ old('lokasi') == $lokasi->id_lokasi ? 'selected' : '' }}>
+                                    {{ $lokasi->nama_lokasi }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <!-- FOOTER -->
+                <div class="flex justify-end gap-3 pt-4 border-t">
+                    <button type="button" onclick="closeModal('addModal')"
+                        class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition">
+                        Batal
+                    </button>
+                    <button type="submit"
+                        class="px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition shadow">
+                        Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
 
     <script>
