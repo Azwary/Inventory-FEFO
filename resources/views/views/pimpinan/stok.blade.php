@@ -185,7 +185,7 @@
 
                             <!-- MODAL DETAIL -->
                             <div id="detailModal{{ $stok->id_stok }}"
-                                class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+                                class="fixed inset-0 bg-black/50 hidden flex border-black  items-center justify-center p-4 z-50">
 
                                 <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
 
