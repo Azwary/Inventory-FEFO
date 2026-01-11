@@ -1,5 +1,5 @@
 <div>
-    @forelse ($notifications->where('jumlah_masuk', '>', 0) as $notif)
+    @forelse ($notifications->where('jumlah_stok', '>', 0) as $notif)
         <div class="flex items-center justify-between mb-3 p-2 border rounded">
             <div class="flex items-center space-x-3">
                 <span>

@@ -25,7 +25,7 @@
                         @foreach ($stoks as $stok)
                             <option value="{{ $stok->id_stok }}"
                                 data-nama="{{ optional($stok->barang)->obat?->nama_obat ?? '-' }}"
-                                data-stok="{{ $stok->jumlah_masuk }}" data-batch="{{ $stok->nomor_batch }}"
+                                data-stok="{{ $stok->jumlah_stok }}" data-batch="{{ $stok->nomor_batch }}"
                                 data-exp="{{ $stok->tanggal_kadaluarsa }}">
                                 {{ optional($stok->barang)->obat?->nama_obat ?? '-' }}
                                 (Exp: {{ $stok->tanggal_kadaluarsa }})

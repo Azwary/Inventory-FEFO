@@ -82,7 +82,7 @@
                                     {{ \Carbon\Carbon::parse($s->tanggal_kadaluarsa)->format('d-m-Y') }}
                                 </td>
                                 <td class="px-4 py-2 text-right font-semibold">
-                                    {{ $s->jumlah_masuk }}
+                                    {{ $s->jumlah_stok }}
                                 </td>
                             </tr>
                         @empty

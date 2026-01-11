@@ -11,7 +11,7 @@
     <div class="p-6 bg-white rounded-lg shadow mb-4">
         <h2 class="font-bold mb-4">Daftar Batch Kritis (FEFO Alert)</h2>
 
-        @forelse ($notifications->where('jumlah_masuk', '>=', 1) as $notif)
+        @forelse ($notifications->where('jumlah_stok', '>=', 1) as $notif)
             <div
                 class="flex flex-col sm:flex-row sm:items-center justify-between mb-3 p-4 border rounded-lg gap-4 sm:gap-0 hover:shadow-sm transition-shadow">
 
@@ -34,7 +34,7 @@
                             Sisa {{ $notif->sisa_hari }} hari. Segera keluarkan/diskon.
                         </p>
                         <p class="text-sm text-gray-600">
-                            Sisa Stok {{ $notif->jumlah_masuk }}
+                            Sisa Stok {{ $notif->jumlah_stok }}
                         </p>
                     </div>
                 </div>

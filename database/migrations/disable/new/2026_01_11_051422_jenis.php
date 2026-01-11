@@ -11,10 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('persediaan', function (Blueprint $table) {
-            $table->string('id_persediaan', 5)->primary();
-            $table->integer('stok_barang')->default(0);
-            // $table->integer('stok_minimum')->nullable();
+        Schema::create('jenis', function (Blueprint $table) {
+            $table->string('id_jenis', 5)->primary();
+            $table->string('nama_jenis');
             $table->timestamps();
         });
     }
@@ -24,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('persediaan');
+        Schema::dropIfExists('jenis');
     }
 };

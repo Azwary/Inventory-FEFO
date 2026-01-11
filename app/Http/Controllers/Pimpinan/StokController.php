@@ -27,7 +27,7 @@ class StokController extends Controller
             DB::raw("
             SUM(
                 CASE
-                    WHEN jumlah_masuk > 0 THEN 1
+                    WHEN jumlah_stok> 0 THEN 1
                     ELSE 0
                 END
             ) AS jumlah_item
@@ -36,7 +36,7 @@ class StokController extends Controller
             DB::raw("
             SUM(
                 CASE
-                    WHEN jumlah_masuk > 0
+                    WHEN jumlah_stok > 0
                     AND tanggal_kadaluarsa IS NOT NULL
                     AND tanggal_kadaluarsa BETWEEN CURDATE()
                     AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)

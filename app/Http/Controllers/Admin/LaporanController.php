@@ -24,7 +24,7 @@ class LaporanController extends Controller
             'satuan',
             'lokasi'
         ])
-            ->where('jumlah_masuk', '>', 0)
+            ->where('jumlah_stok', '>', 0)
             ->when(
                 $dari && $sampai,
                 fn($q) =>
@@ -42,7 +42,7 @@ class LaporanController extends Controller
         return view('views.admin.laporan', [
             'stokAktif'   => $stokAktif,
             'totalBatch' => $stokAktif->count(),
-            'totalStok'  => $stokAktif->sum('jumlah_masuk'),
+            'totalStok'  => $stokAktif->sum('jumlah_stok'),
             'totalKeluar' => $barangKeluar->sum('jumlah'),
             'dari'       => $dari,
             'sampai'     => $sampai
@@ -55,11 +55,10 @@ class LaporanController extends Controller
         $sampai = $request->sampai_tanggal;
 
         $stokAktif = StokBarang::with(['obat', 'lokasi'])
-            ->where('jumlah_masuk', '>', 0)
+            ->where('jumlah_stok', '>', 0)
             ->when(
                 $dari && $sampai,
-                fn($q) =>
-                $q->whereBetween('tanggal_masuk', [$dari, $sampai])
+                fn($q) => $q->whereBetween('tanggal_masuk', [$dari, $sampai])
             )
             ->orderBy('tanggal_kadaluarsa')
             ->get();
@@ -67,33 +66,36 @@ class LaporanController extends Controller
         return new StreamedResponse(function () use ($stokAktif) {
             $handle = fopen('php://output', 'w');
 
+            // HEADER
             fputcsv($handle, [
                 'Nama Obat',
                 'Batch',
                 'Lokasi',
                 'Tanggal Masuk',
-                'Kadaluarsa',
+                'Tanggal Kadaluarsa',
                 'Jumlah'
-            ]);
+            ], ';');
 
+            // DATA
             foreach ($stokAktif as $s) {
                 fputcsv($handle, [
-                    $s->obat?->nama_obat ?? '-',
+                    $s->barang->obat?->nama_obat ?? '-',
                     $s->nomor_batch,
                     $s->lokasi?->nama_lokasi ?? '-',
                     $s->tanggal_masuk,
                     $s->tanggal_kadaluarsa,
-                    $s->jumlah_masuk
-                ]);
+                    $s->jumlah_stok
+                ], ';');
             }
 
             fclose($handle);
         }, 200, [
-            'Content-Type' => 'text/csv',
+            'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' =>
             'attachment; filename=laporan_stok_' . now()->format('Ymd_His') . '.csv',
         ]);
     }
+
 
     public function exportPdf(Request $request)
     {
@@ -101,7 +103,7 @@ class LaporanController extends Controller
         $sampai = $request->sampai_tanggal;
 
         $stokAktif = StokBarang::with(['obat', 'lokasi'])
-            ->where('jumlah_masuk', '>', 0)
+            ->where('jumlah_stok', '>', 0)
             ->when(
                 $dari && $sampai,
                 fn($q) =>

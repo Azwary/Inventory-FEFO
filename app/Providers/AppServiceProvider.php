@@ -30,7 +30,7 @@ class AppServiceProvider extends ServiceProvider
                 '*',
                 DB::raw('DATEDIFF(tanggal_kadaluarsa, CURDATE()) AS sisa_hari')
             )
-                ->where('jumlah_masuk', '>', 0)
+                ->where('jumlah_stok', '>', 0)
                 ->whereNotNull('tanggal_kadaluarsa')
                 ->whereBetween('tanggal_kadaluarsa', [
                     now()->toDateString(),

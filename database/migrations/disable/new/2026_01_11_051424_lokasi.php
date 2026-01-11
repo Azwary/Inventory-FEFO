@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('persediaan', function (Blueprint $table) {
-            $table->string('id_persediaan', 5)->primary();
-            $table->integer('stok_barang')->default(0);
-            // $table->integer('stok_minimum')->nullable();
+        Schema::create('lokasi', function (Blueprint $table) {
+            $table->string('id_lokasi', 5)->primary();
+            $table->string('nama_lokasi', 50);
+            $table->string('keterangan', 50);
             $table->timestamps();
         });
     }
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('persediaan');
+        Schema::dropIfExists('lokasi');
     }
 };

@@ -142,7 +142,7 @@
                 </thead>
                 <tbody>
                     @php
-                        $filteredStoks = $stoks->where('jumlah_masuk', '>', 0);
+                        $filteredStoks = $stoks->where('jumlah_stok', '>', 0);
                     @endphp
 
                     @if ($filteredStoks->isEmpty())
@@ -172,7 +172,7 @@
                                 <td class="border px-3 py-2">{{ $stok->tanggal_masuk }}</td>
                                 <td class="border px-3 py-2">{{ $stok->tanggal_kadaluarsa ?? '-' }}</td>
                                 <td class="border px-3 py-2 font-semibold text-green-700">
-                                    {{ $stok->jumlah_masuk }}
+                                    {{ $stok->jumlah_stok }}
                                 </td>
                                 <td class="border px-3 py-2">{{ $stok->lokasi->nama_lokasi ?? '-' }}</td>
                                 <td class="border px-3 py-2">
@@ -248,7 +248,7 @@
                                             <div>
                                                 <p class="text-sm text-blue-700">Jumlah Stok</p>
                                                 <p class="text-2xl font-bold text-blue-800">
-                                                    {{ $stok->jumlah_masuk }}
+                                                    {{ $stok->jumlah_stok }}
                                                 </p>
                                             </div>
 

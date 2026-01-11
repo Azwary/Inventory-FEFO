@@ -142,7 +142,7 @@
                 </thead>
                 <tbody>
                     @php
-                        $filteredStoks = $stoks->where('jumlah_masuk', '>', 0);
+                        $filteredStoks = $stoks->where('jumlah_stok', '>', 0);
                     @endphp
 
                     @if ($filteredStoks->isEmpty())
@@ -172,7 +172,7 @@
                                 <td class="border px-3 py-2">{{ $stok->tanggal_masuk }}</td>
                                 <td class="border px-3 py-2">{{ $stok->tanggal_kadaluarsa ?? '-' }}</td>
                                 <td class="border px-3 py-2 font-semibold text-green-700">
-                                    {{ $stok->jumlah_masuk }}
+                                    {{ $stok->jumlah_stok }}
                                 </td>
                                 <td class="border px-3 py-2">{{ $stok->lokasi->nama_lokasi ?? '-' }}</td>
                                 <td class="border px-3 py-2">
@@ -248,7 +248,7 @@
                                             <div>
                                                 <p class="text-sm text-blue-700">Jumlah Stok</p>
                                                 <p class="text-2xl font-bold text-blue-800">
-                                                    {{ $stok->jumlah_masuk }}
+                                                    {{ $stok->jumlah_stok }}
                                                 </p>
                                             </div>
 
@@ -297,7 +297,8 @@
             </div>
 
             <!-- BODY -->
-            <form action="{{ route('admin.stok.store') }}" method="POST" class="p-6 space-y-5">
+            <form action="{{ route('admin.stok.store') }}" method="POST" class="p-6 space-y-5"
+                onsubmit="handleSubmit(this)">
                 @csrf
 
                 <!-- NAMA OBAT -->
@@ -408,8 +409,7 @@
                         class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition">
                         Batal
                     </button>
-                    <button type="submit"
-                        class="px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition shadow">
+                    <button type="submit" class="px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 shadow">
                         Simpan
                     </button>
                 </div>
@@ -433,6 +433,12 @@
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
             }
+        }
+
+        function handleSubmit(form) {
+            const btn = form.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerText = 'Menyimpan...';
         }
     </script>
 @endsection

@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('nomor_batch', 10);
             $table->date('tanggal_masuk');
             $table->date('tanggal_kadaluarsa');
-            $table->integer('jumlah_masuk');
-            $table->integer('jumlah_sisa')->nullable();
+            $table->integer('jumlah_stok');
+            $table->integer('jumlah_sisa')->default('0');
 
             $table->foreign('id_barang')->references('id_barang')->on('barang')->onDelete('cascade');
             $table->foreign('id_lokasi')->references('id_lokasi')->on('lokasi')->onDelete('cascade');

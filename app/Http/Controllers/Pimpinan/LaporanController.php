@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers\Pimpinan;
 
+use App\Http\Controllers\Controller;
 use App\Models\BarangKeluar;
 use App\Models\StokBarang;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class LaporanController extends Controller
 {
+
     public function index(Request $request)
     {
         $dari   = $request->dari_tanggal;
@@ -23,7 +24,7 @@ class LaporanController extends Controller
             'satuan',
             'lokasi'
         ])
-            ->where('jumlah_masuk', '>', 0)
+            ->where('jumlah_stok', '>', 0)
             ->when(
                 $dari && $sampai,
                 fn($q) =>
@@ -41,7 +42,7 @@ class LaporanController extends Controller
         return view('views.pimpinan.laporan', [
             'stokAktif'   => $stokAktif,
             'totalBatch' => $stokAktif->count(),
-            'totalStok'  => $stokAktif->sum('jumlah_masuk'),
+            'totalStok'  => $stokAktif->sum('jumlah_stok'),
             'totalKeluar' => $barangKeluar->sum('jumlah'),
             'dari'       => $dari,
             'sampai'     => $sampai
@@ -54,11 +55,10 @@ class LaporanController extends Controller
         $sampai = $request->sampai_tanggal;
 
         $stokAktif = StokBarang::with(['obat', 'lokasi'])
-            ->where('jumlah_masuk', '>', 0)
+            ->where('jumlah_stok', '>', 0)
             ->when(
                 $dari && $sampai,
-                fn($q) =>
-                $q->whereBetween('tanggal_masuk', [$dari, $sampai])
+                fn($q) => $q->whereBetween('tanggal_masuk', [$dari, $sampai])
             )
             ->orderBy('tanggal_kadaluarsa')
             ->get();
@@ -66,33 +66,36 @@ class LaporanController extends Controller
         return new StreamedResponse(function () use ($stokAktif) {
             $handle = fopen('php://output', 'w');
 
+            // HEADER
             fputcsv($handle, [
                 'Nama Obat',
                 'Batch',
                 'Lokasi',
                 'Tanggal Masuk',
-                'Kadaluarsa',
+                'Tanggal Kadaluarsa',
                 'Jumlah'
-            ]);
+            ], ';');
 
+            // DATA
             foreach ($stokAktif as $s) {
                 fputcsv($handle, [
-                    $s->obat?->nama_obat ?? '-',
+                    $s->barang->obat?->nama_obat ?? '-',
                     $s->nomor_batch,
                     $s->lokasi?->nama_lokasi ?? '-',
                     $s->tanggal_masuk,
                     $s->tanggal_kadaluarsa,
-                    $s->jumlah_masuk
-                ]);
+                    $s->jumlah_stok
+                ], ';');
             }
 
             fclose($handle);
         }, 200, [
-            'Content-Type' => 'text/csv',
+            'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' =>
             'attachment; filename=laporan_stok_' . now()->format('Ymd_His') . '.csv',
         ]);
     }
+
 
     public function exportPdf(Request $request)
     {
@@ -100,7 +103,7 @@ class LaporanController extends Controller
         $sampai = $request->sampai_tanggal;
 
         $stokAktif = StokBarang::with(['obat', 'lokasi'])
-            ->where('jumlah_masuk', '>', 0)
+            ->where('jumlah_stok', '>', 0)
             ->when(
                 $dari && $sampai,
                 fn($q) =>
@@ -109,7 +112,7 @@ class LaporanController extends Controller
             ->orderBy('tanggal_kadaluarsa')
             ->get();
 
-        return Pdf::loadView('views.admin.laporan_pdf', [
+        return Pdf::loadView('views.pimpinan.laporan_pdf', [
             'stokAktif' => $stokAktif,
             'dari' => $dari,
             'sampai' => $sampai
