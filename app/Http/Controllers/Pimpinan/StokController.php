@@ -23,37 +23,49 @@ class StokController extends Controller
 
         $rakStoks = StokBarang::select(
             'id_lokasi',
-            DB::raw('COUNT(*) AS jumlah_item'),
+
             DB::raw("
-                SUM(
-                    CASE
-                        WHEN tanggal_kadaluarsa IS NOT NULL
-                        AND tanggal_kadaluarsa BETWEEN CURDATE()
-                        AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)
-                        THEN 1 ELSE 0
-                    END
-                ) AS warning_item
-            ")
+            SUM(
+                CASE
+                    WHEN jumlah_stok> 0 THEN 1
+                    ELSE 0
+                END
+            ) AS jumlah_item
+        "),
+
+            DB::raw("
+            SUM(
+                CASE
+                    WHEN jumlah_stok > 0
+                    AND tanggal_kadaluarsa IS NOT NULL
+                    AND tanggal_kadaluarsa BETWEEN CURDATE()
+                    AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS warning_item
+        ")
         )
             ->with('lokasi')
             ->groupBy('id_lokasi')
             ->get();
 
         $stoks = StokBarang::with([
-            'obat',
-            'jenis',
-            'kategori',
-            'satuan',
+            'barang.obat',
+            'barang.jenis',
+            'barang.kategori',
+            'barang.satuan',
             'lokasi'
         ])
             ->when($search, function ($query) use ($search) {
-                $query->whereHas('obat', function ($q) use ($search) {
+                $query->whereHas('barang.obat', function ($q) use ($search) {
                     $q->where('nama_obat', 'like', "%{$search}%");
                 })
                     ->orWhere('nomor_batch', 'like', "%{$search}%");
             })
             ->orderBy('tanggal_kadaluarsa', $orderExp)
             ->get();
+
 
         $obats = Obat::select('id_obat', 'nama_obat')->get();
         $jeniss = Jenis::select('id_jenis', 'nama_jenis')->get();

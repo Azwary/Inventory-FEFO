@@ -5,10 +5,11 @@
 @section('content')
     <div class="space-y-6">
 
-        <div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg shadow text-white">
+        {{-- <div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg shadow text-white">
             <h2 class="text-2xl font-bold">Laporan & Analisis Data</h2>
             <p class="text-sm opacity-90">Monitoring stok aktif dan aktivitas gudang</p>
-        </div>
+        </div> --}}
+
 
         <div class="p-6 bg-white rounded-lg shadow">
             <form method="GET" action="{{ route('pimpinan.laporan-audit.index') }}">
@@ -26,75 +27,107 @@
                         <input type="date" name="sampai_tanggal" value="{{ $sampai }}"
                             class="w-full border rounded px-3 py-2 mt-1">
                     </div>
-
                     <div>
                         <button type="submit"
                             class="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
                             Generate Laporan
                         </button>
                     </div>
-
-                    @isset($stokAktif)
+                    @if (isset($barangMasuk) || isset($barangKeluar))
                         <div class="flex gap-2">
                             <a href="{{ route('pimpinan.laporan-audit.export.csv', request()->query()) }}"
-                                class="w-full text-center bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700">
+                                class="w-full text-center bg-green-600 text-white px-3 py-2 rounded">
                                 CSV
                             </a>
                             <a href="{{ route('pimpinan.laporan-audit.export.pdf', request()->query()) }}"
-                                class="w-full text-center bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700">
+                                class="w-full text-center bg-red-600 text-white px-3 py-2 rounded">
                                 PDF
                             </a>
                         </div>
-                    @endisset
+                    @endif
                 </div>
             </form>
         </div>
 
+        <div class="grid grid-cols-2 gap-4">
+            <div class="p-4 bg-green-50 rounded">
+                <p class="text-sm text-gray-600">Total Barang Masuk</p>
+                <p class="text-xl font-bold text-green-600">{{ $totalMasuk }}</p>
+            </div>
+            <div class="p-4 bg-red-50 rounded">
+                <p class="text-sm text-gray-600">Total Barang Keluar</p>
+                <p class="text-xl font-bold text-red-600">{{ $totalKeluar }}</p>
+            </div>
+        </div>
 
-        @isset($stokAktif)
+        @if (isset($barangMasuk) || isset($barangKeluar))
             <div class="bg-white rounded-lg shadow overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead class="bg-gray-100 text-gray-700">
                         <tr>
-                            <th class="px-4 py-3 text-left">Obat</th>
-                            <th class="px-4 py-3">Batch</th>
-                            <th class="px-4 py-3">Lokasi</th>
-                            <th class="px-4 py-3">Kadaluarsa</th>
+                            <th class="px-4 py-3">Jenis</th>
+                            <th class="px-4 py-3 text-left">Nama Barang</th>
+                            <th class="px-4 py-3">Tanggal</th>
                             <th class="px-4 py-3 text-right">Jumlah</th>
+                            <th class="px-4 py-3">Keterangan</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y">
-                        @forelse($stokAktif as $s)
+
+                        {{-- BARANG MASUK --}}
+                        @forelse($barangMasuk as $m)
                             <tr class="hover:bg-gray-50">
-                                <td class="px-4 py-2 font-medium">
-                                    {{ $s->barang->obat?->nama_obat ?? '-' }}
+                                <td class="px-4 py-2 text-center text-green-600 font-semibold">
+                                    Masuk
+                                </td>
+                                <td class="px-4 py-2">
+                                    {{ $m->barang?->obat?->nama_obat ?? '-' }}
                                 </td>
                                 <td class="px-4 py-2 text-center">
-                                    <span class="px-2 py-1 text-xs bg-gray-200 rounded">
-                                        {{ $s->nomor_batch }}
-                                    </span>
-                                </td>
-                                <td class="px-4 py-2 text-center">
-                                    {{ $s->lokasi?->nama_lokasi ?? '-' }}
-                                </td>
-                                <td class="px-4 py-2 text-center">
-                                    {{ \Carbon\Carbon::parse($s->tanggal_kadaluarsa)->format('d-m-Y') }}
+                                    {{ \Carbon\Carbon::parse($m->tanggal_masuk)->format('d-m-Y') }}
                                 </td>
                                 <td class="px-4 py-2 text-right font-semibold">
-                                    {{ $s->jumlah_masuk }}
+                                    {{ $m->jumlah_masuk }}
+                                </td>
+                                <td class="px-4 py-2">
+                                    {{ $m->keterangan }}
+                                </td>
+                            </tr>
+                        @empty
+                        @endforelse
+
+                        {{-- BARANG KELUAR --}}
+                        @forelse($barangKeluar as $k)
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-2 text-center text-red-600 font-semibold">
+                                    Keluar
+                                </td>
+                                <td class="px-4 py-2">
+                                    {{ $k->barang?->obat?->nama_obat ?? '-' }}
+                                </td>
+                                <td class="px-4 py-2 text-center">
+                                    {{ $k->created_at->format('d-m-Y') }}
+                                </td>
+                                <td class="px-4 py-2 text-right font-semibold">
+                                    {{ $k->jumlah_keluar }}
+                                </td>
+                                <td class="px-4 py-2">
+                                    {{ $k->keterangan }}
                                 </td>
                             </tr>
                         @empty
                             <tr>
                                 <td colspan="5" class="text-center py-6 text-gray-500">
-                                    Tidak ada data laporan
+                                    Tidak ada transaksi
                                 </td>
                             </tr>
                         @endforelse
+
                     </tbody>
                 </table>
             </div>
-        @endisset
+        @endif
+
 
     </div>
 @endsection

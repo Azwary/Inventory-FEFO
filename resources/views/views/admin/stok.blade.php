@@ -3,10 +3,10 @@
 @section('title', 'Persediaan / Stok Obat')
 
 @section('content')
-    <div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg shadow text-white mb-6">
+    {{-- <div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg shadow text-white mb-6">
         <h2 class="text-2xl font-bold">Persediaan / Stok Obat</h2>
         <p class="text-sm opacity-90">Informasi Persediaan / Stok Obat</p>
-    </div>
+    </div> --}}
 
     <div class="p-6 bg-white rounded-lg shadow">
 
@@ -141,64 +141,174 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($stoks as $stok)
-                        <tr class="hover:bg-gray-50">
-                            <td class="border px-3 py-2">{{ $stok->id_stok ?? '-' }}</td>
-                            <td class="border px-3 py-2">{{ $stok->barang->obat?->nama_obat ?? '-' }}
-                            </td>
-                            {{-- {{ dd($stok->barang, $stok->barang?->obat) }} --}}
+                    @php
+                        $filteredStoks = $stoks->where('jumlah_stok', '>', 0);
+                    @endphp
 
-
-                            <td class="border px-3 py-2">{{ $stok->nomor_batch }}</td>
-                            <td class="border px-3 py-2">{{ $stok->tanggal_masuk ?? '-' }}</td>
-                            <td class="border px-3 py-2">{{ $stok->tanggal_kadaluarsa ?? '-' }}
-                            </td>
-                            <td class="border px-3 py-2">{{ $stok->jumlah_masuk ?? '-' }}</td>
-                            <td class="border px-3 py-2">{{ $stok->lokasi->nama_lokasi ?? '-' }}</td>
-                            <td class="border px-3 py-2">
-                                <button type="button" onclick="openModal('detailModal{{ $stok->id_barang }}')"
-                                    class="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition sm:w-auto">Detail</button>
+                    @if ($filteredStoks->isEmpty())
+                        <tr>
+                            <td colspan="8" class="py-10 text-center text-gray-500">
+                                @if (request('search'))
+                                    <div class="flex flex-col items-center gap-2">
+                                        <p class="font-semibold">
+                                            Data dengan kata kunci
+                                            <span class="text-blue-600">"{{ request('search') }}"</span>
+                                            tidak ditemukan
+                                        </p>
+                                    </div>
+                                @else
+                                    <p class="italic">Tidak ada stok obat tersedia</p>
+                                @endif
                             </td>
                         </tr>
+                    @else
+                        @foreach ($filteredStoks as $stok)
+                            <tr class="hover:bg-gray-50">
+                                <td class="border px-3 py-2">{{ $stok->id_stok }}</td>
+                                <td class="border px-3 py-2">
+                                    {{ $stok->barang->obat?->nama_obat ?? '-' }}
+                                </td>
+                                <td class="border px-3 py-2">{{ $stok->nomor_batch }}</td>
+                                <td class="border px-3 py-2">{{ $stok->tanggal_masuk }}</td>
+                                <td class="border px-3 py-2">{{ $stok->tanggal_kadaluarsa ?? '-' }}</td>
+                                <td class="border px-3 py-2 font-semibold text-green-700">
+                                    {{ $stok->jumlah_stok }}
+                                </td>
+                                <td class="border px-3 py-2">{{ $stok->lokasi->nama_lokasi ?? '-' }}</td>
+                                <td class="border px-3 py-2">
+                                    <button onclick="openModal('detailModal{{ $stok->id_stok }}')"
+                                        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                                        Detail
+                                    </button>
+                                </td>
+                            </tr>
 
-                        <div id="detailModal{{ $stok->id_barang }}"
-                            class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
-                            <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
-                                <h3 class="text-lg font-semibold mb-4">Detail Obat:
-                                    {{ $stok->barang->obat?->nama_obat ?? '-' }}</h3>
-                                <ul class="mb-4 space-y-1">
-                                    <li><strong>Kode:</strong> {{ $stok->id_stok ?? '-' }}</li>
-                                    <li><strong>Batch:</strong> {{ $stok->nomor_batch ?? '-' }}</li>
-                                    <li><strong>Tanggal Masuk:</strong>
-                                        {{ $stok->tanggal_masuk ?? '-' }}</li>
-                                    <li><strong>Tanggal Exp:</strong>
-                                        {{ $stok->tanggal_kadaluarsa ?? '-' }}</li>
-                                    <li><strong>Jumlah:</strong> {{ $stok->jumlah_masuk ?? '-' }}</li>
-                                    <li><strong>Lokasi:</strong> {{ $stok->lokasi->nama_lokasi ?? '-' }}</li>
-                                    <li><strong>Satuan:</strong> {{ $stok->barang->satuan->nama_satuan ?? '-' }}</li>
-                                </ul>
-                                <div class="flex justify-end">
-                                    <button type="button" onclick="closeModal('detailModal{{ $stok->id_barang }}')"
-                                        class="px-4 py-2 bg-gray-200 rounded">Tutup</button>
+                            <!-- MODAL DETAIL -->
+                            <div id="detailModal{{ $stok->id_stok }}"
+                                class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+
+                                <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+
+
+                                    <!-- HEADER -->
+                                    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-5 text-white">
+                                        <h3 class="text-lg font-bold">Detail Stok Obat</h3>
+                                        <p class="text-sm opacity-90">
+                                            {{ $stok->barang->obat?->nama_obat ?? '-' }}
+                                        </p>
+                                    </div>
+
+                                    <!-- BODY -->
+                                    <div class="p-5 space-y-4">
+                                        <div class="grid grid-cols-2 gap-3 text-sm">
+                                            <div class="bg-gray-50 p-3 rounded">
+                                                <p class="text-gray-500">Kode Stok</p>
+                                                <p class="font-semibold">{{ $stok->id_stok }}</p>
+                                            </div>
+
+                                            <div class="bg-gray-50 p-3 rounded">
+                                                <p class="text-gray-500">Batch</p>
+                                                <p class="font-semibold">{{ $stok->nomor_batch }}</p>
+                                            </div>
+
+                                            <div class="bg-gray-50 p-3 rounded">
+                                                <p class="text-gray-500">Tanggal Masuk</p>
+                                                <p class="font-semibold">{{ $stok->tanggal_masuk }}</p>
+                                            </div>
+
+                                            <div class="bg-gray-50 p-3 rounded">
+                                                <p class="text-gray-500">Tanggal Exp</p>
+                                                <p class="font-semibold text-red-600">
+                                                    {{ $stok->tanggal_kadaluarsa ?? '-' }}
+                                                </p>
+                                            </div>
+
+                                            <div class="bg-gray-50 p-3 rounded">
+                                                <p class="text-gray-500">Lokasi</p>
+                                                <p class="font-semibold">
+                                                    {{ $stok->lokasi->nama_lokasi ?? '-' }}
+                                                </p>
+                                            </div>
+
+                                            <div class="bg-gray-50 p-3 rounded">
+                                                <p class="text-gray-500">Satuan</p>
+                                                <p class="font-semibold">
+                                                    {{ $stok->barang->satuan->nama_satuan ?? '-' }}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        @php
+                                            $expired = $stok->tanggal_kadaluarsa
+                                                ? \Carbon\Carbon::parse($stok->tanggal_kadaluarsa)->isPast()
+                                                : false;
+                                        @endphp
+
+                                        <div class="flex justify-between items-center bg-blue-50 border p-4 rounded">
+                                            <div>
+                                                <p class="text-sm text-blue-700">Jumlah Stok</p>
+                                                <p class="text-2xl font-bold text-blue-800">
+                                                    {{ $stok->jumlah_stok }}
+                                                </p>
+                                            </div>
+
+                                            <span
+                                                class="px-3 py-1 rounded-full text-xs font-semibold
+                            {{ $expired ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700' }}">
+                                                {{ $expired ? 'EXPIRED' : 'AKTIF' }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- FOOTER -->
+                                    <div class="px-5 py-4 bg-gray-50 text-right">
+                                        <button onclick="closeModal('detailModal{{ $stok->id_stok }}')"
+                                            class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+                                            Tutup
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    @endforeach
+                        @endforeach
+                    @endif
                 </tbody>
+
+
             </table>
         </div>
     </div>
 
     <div id="addModal"
-        class="fixed inset-0 bg-black bg-opacity-50 hidden items-start justify-center overflow-auto p-4 z-50">
-        <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl p-6 mt-10">
-            <h3 class="text-lg font-semibold mb-6">Tambah Stok Obat</h3>
+        class="fixed inset-0 bg-black/60 hidden items-start justify-center overflow-auto p-4 z-50 backdrop-blur-sm">
 
-            <form action="{{ route('admin.stok.store') }}" method="POST">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl mt-10 overflow-hidden animate-fade-in">
+
+            <!-- HEADER -->
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4 text-white">
+                <h3 class="text-xl font-bold flex items-center gap-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M12 4v16m8-8H4" />
+                    </svg>
+                    Tambah Stok Obat
+                </h3>
+                <p class="text-sm opacity-90 mt-1">
+                    Input data obat masuk ke gudang
+                </p>
+            </div>
+
+            <!-- BODY -->
+            <form action="{{ route('admin.stok.store') }}" method="POST" class="p-6 space-y-5"
+                onsubmit="handleSubmit(this)">
                 @csrf
-                <div class="mb-4">
-                    <label for="nama_obat" class="block font-medium mb-1">Nama Obat</label>
-                    <select name="nama_obat" id="nama_obat" class="border rounded px-3 py-2 w-full" required>
+
+                <!-- NAMA OBAT -->
+                <div>
+                    <label for="nama_obat" class="block text-sm font-semibold mb-1">
+                        Nama Obat
+                    </label>
+                    <select name="nama_obat" id="nama_obat"
+                        class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        required>
                         <option value="" disabled selected>Pilih Obat..</option>
                         @foreach ($obats as $obat)
                             <option value="{{ $obat->id_obat }}"
@@ -208,32 +318,26 @@
                         @endforeach
                     </select>
                     @error('nama_obat')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
+                <!-- GRID FORM -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {{-- <div class="mb-4">
-                        <label for="batch">Nomor Batch</label>
-                        <input type="text" name="batch" id="batch" class="border rounded px-3 py-2 w-full"
-                            placeholder="Contoh: NB001" value="{{ old('batch') }}" required>
-                        @error('batch')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div> --}}
 
-                    <div class="mb-4">
-                        <label for="jumlah">Jumlah Masuk</label>
-                        <input type="number" name="jumlah" id="jumlah" class="border rounded px-3 py-2 w-full"
-                            value="{{ old('jumlah') }}" required>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Jumlah Masuk</label>
+                        <input type="number" name="jumlah" value="{{ old('jumlah') }}"
+                            class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500" required>
                         @error('jumlah')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    <div class="mb-4">
-                        <label for="satuan">Satuan</label>
-                        <select name="satuan" id="satuan" class="border rounded px-3 py-2 w-full" required>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Satuan</label>
+                        <select name="satuan" class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500"
+                            required>
                             <option value="" disabled selected>Pilih Satuan..</option>
                             @foreach ($satuans as $satuan)
                                 <option value="{{ $satuan->id_satuan }}"
@@ -242,14 +346,12 @@
                                 </option>
                             @endforeach
                         </select>
-                        @error('satuan')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
                     </div>
 
-                    <div class="mb-4">
-                        <label for="jenis">Jenis</label>
-                        <select name="jenis" id="jenis" class="border rounded px-3 py-2 w-full" required>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Jenis</label>
+                        <select name="jenis" class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500"
+                            required>
                             <option value="" disabled selected>Pilih Jenis..</option>
                             @foreach ($jeniss as $jenis)
                                 <option value="{{ $jenis->id_jenis }}"
@@ -258,14 +360,12 @@
                                 </option>
                             @endforeach
                         </select>
-                        @error('jenis')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
                     </div>
 
-                    <div class="mb-4">
-                        <label for="kategori">Kategori</label>
-                        <select name="kategori" id="kategori" class="border rounded px-3 py-2 w-full" required>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Kategori</label>
+                        <select name="kategori" class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500"
+                            required>
                             <option value="" disabled selected>Pilih Kategori..</option>
                             @foreach ($kategoris as $kategori)
                                 <option value="{{ $kategori->id_kategori }}"
@@ -274,32 +374,24 @@
                                 </option>
                             @endforeach
                         </select>
-                        @error('kategori')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
                     </div>
 
-                    <div class="mb-4">
-                        <label for="tanggal_masuk">Tanggal Masuk</label>
-                        <input type="date" name="tanggal_masuk" id="tanggal_masuk"
-                            class="border rounded px-3 py-2 w-full" value="{{ old('tanggal_masuk') }}" required>
-                        @error('tanggal_masuk')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Tanggal Masuk</label>
+                        <input type="date" name="tanggal_masuk" value="{{ old('tanggal_masuk') }}"
+                            class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500" required>
                     </div>
 
-                    <div class="mb-4">
-                        <label for="tanggal_exp">Tanggal Kedaluwarsa</label>
-                        <input type="date" name="tanggal_exp" id="tanggal_exp"
-                            class="border rounded px-3 py-2 w-full" value="{{ old('tanggal_exp') }}" required>
-                        @error('tanggal_exp')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Tanggal Kedaluwarsa</label>
+                        <input type="date" name="tanggal_exp" value="{{ old('tanggal_exp') }}"
+                            class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500" required>
                     </div>
 
-                    <div class="mb-4">
-                        <label for="lokasi">Lokasi</label>
-                        <select name="lokasi" id="lokasi" class="border rounded px-3 py-2 w-full" required>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold mb-1">Lokasi</label>
+                        <select name="lokasi" class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500"
+                            required>
                             <option value="" disabled selected>Pilih Lokasi..</option>
                             @foreach ($lokasis as $lokasi)
                                 <option value="{{ $lokasi->id_lokasi }}"
@@ -308,20 +400,23 @@
                                 </option>
                             @endforeach
                         </select>
-                        @error('lokasi')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
                     </div>
                 </div>
 
-                <div class="flex justify-end gap-2 mt-4">
+                <!-- FOOTER -->
+                <div class="flex justify-end gap-3 pt-4 border-t">
                     <button type="button" onclick="closeModal('addModal')"
-                        class="px-4 py-2 border rounded bg-gray-200">Batal</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Simpan</button>
+                        class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition">
+                        Batal
+                    </button>
+                    <button type="submit" class="px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 shadow">
+                        Simpan
+                    </button>
                 </div>
             </form>
         </div>
     </div>
+
 
     <script>
         function openModal(id) {
@@ -338,6 +433,12 @@
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
             }
+        }
+
+        function handleSubmit(form) {
+            const btn = form.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerText = 'Menyimpan...';
         }
     </script>
 @endsection

@@ -28,7 +28,7 @@ class DashboardController extends Controller
             'satuan',
             'lokasi'
         ])
-            ->where('jumlah_masuk', '>', 0)
+            ->where('jumlah_stok', '>', 0)
             ->when(
                 $dari && $sampai,
                 fn($q) =>
@@ -46,8 +46,8 @@ class DashboardController extends Controller
 
 
         $totalBatchAktif = $stokAktif->count();
-        $totalStok       = $stokAktif->sum('jumlah_masuk');
-        $totalKeluar     = $barangKeluar->sum('jumlah');
+        $totalStok       = $stokAktif->sum('jumlah_stok');
+        $totalKeluar     = $barangKeluar->sum('jumlah_keluar');
 
         $stokKadaluarsa = $stokAktif->where(
             'tanggal_kadaluarsa',

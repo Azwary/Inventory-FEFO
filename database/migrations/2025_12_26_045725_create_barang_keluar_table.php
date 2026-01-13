@@ -15,7 +15,8 @@ return new class extends Migration
             $table->string('id_keluar', 5)->primary();
             $table->string('id_barang', 5);
             $table->foreignId('id_user')->constrained('users')->onDelete('cascade');
-            $table->integer('jumlah');
+            $table->integer('jumlah_keluar');
+            $table->string('keterangan', 30);
 
             $table->foreign('id_barang')->references('id_barang')->on('barang')->onDelete('cascade');
             $table->timestamps();

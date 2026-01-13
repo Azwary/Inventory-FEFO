@@ -2,49 +2,45 @@
 
 namespace App\Http\Controllers\Pimpinan;
 
+use App\Http\Controllers\Controller;
 use App\Models\BarangKeluar;
+use App\Models\BarangMasuk;
 use App\Models\StokBarang;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class LaporanController extends Controller
 {
+
     public function index(Request $request)
     {
         $dari   = $request->dari_tanggal;
         $sampai = $request->sampai_tanggal;
 
-        $stokAktif = StokBarang::with([
-            'obat',
-            'jenis',
-            'kategori',
-            'satuan',
-            'lokasi'
-        ])
-            ->where('jumlah_masuk', '>', 0)
+        $barangMasuk = BarangMasuk::with('barang')
             ->when(
                 $dari && $sampai,
-                fn($q) =>
-                $q->whereBetween('tanggal_masuk', [$dari, $sampai])
+                fn($q) => $q->whereBetween('tanggal_masuk', [$dari, $sampai])
             )
-            ->orderBy('tanggal_kadaluarsa')
+            ->orderBy('tanggal_masuk')
             ->get();
 
-        $barangKeluar = BarangKeluar::when(
-            $dari && $sampai,
-            fn($q) =>
-            $q->whereBetween('created_at', [$dari, $sampai])
-        )->get();
+        $barangKeluar = BarangKeluar::with('barang')
+            ->when(
+                $dari && $sampai,
+                fn($q) => $q->whereBetween('created_at', [$dari, $sampai])
+            )
+            ->orderBy('created_at')
+            ->get();
 
         return view('views.pimpinan.laporan', [
-            'stokAktif'   => $stokAktif,
-            'totalBatch' => $stokAktif->count(),
-            'totalStok'  => $stokAktif->sum('jumlah_masuk'),
-            'totalKeluar' => $barangKeluar->sum('jumlah'),
-            'dari'       => $dari,
-            'sampai'     => $sampai
+            'barangMasuk'   => $barangMasuk,
+            'barangKeluar'  => $barangKeluar,
+            'totalMasuk'    => $barangMasuk->sum('jumlah_masuk'),
+            'totalKeluar'   => $barangKeluar->sum('jumlah_keluar'),
+            'dari'          => $dari,
+            'sampai'        => $sampai
         ]);
     }
 
@@ -53,68 +49,82 @@ class LaporanController extends Controller
         $dari   = $request->dari_tanggal;
         $sampai = $request->sampai_tanggal;
 
-        $stokAktif = StokBarang::with(['obat', 'lokasi'])
-            ->where('jumlah_masuk', '>', 0)
+        $masuk = BarangMasuk::with('barang')
             ->when(
                 $dari && $sampai,
-                fn($q) =>
-                $q->whereBetween('tanggal_masuk', [$dari, $sampai])
-            )
-            ->orderBy('tanggal_kadaluarsa')
-            ->get();
+                fn($q) => $q->whereBetween('tanggal_masuk', [$dari, $sampai])
+            )->get();
 
-        return new StreamedResponse(function () use ($stokAktif) {
+        $keluar = BarangKeluar::with('barang')
+            ->when(
+                $dari && $sampai,
+                fn($q) => $q->whereBetween('created_at', [$dari, $sampai])
+            )->get();
+
+        return new StreamedResponse(function () use ($masuk, $keluar) {
             $handle = fopen('php://output', 'w');
 
             fputcsv($handle, [
-                'Nama Obat',
-                'Batch',
-                'Lokasi',
-                'Tanggal Masuk',
-                'Kadaluarsa',
-                'Jumlah'
-            ]);
+                'Jenis Transaksi',
+                'Nama Barang',
+                'Tanggal',
+                'Jumlah',
+                'Keterangan'
+            ], ';');
 
-            foreach ($stokAktif as $s) {
+            foreach ($masuk as $m) {
                 fputcsv($handle, [
-                    $s->obat?->nama_obat ?? '-',
-                    $s->nomor_batch,
-                    $s->lokasi?->nama_lokasi ?? '-',
-                    $s->tanggal_masuk,
-                    $s->tanggal_kadaluarsa,
-                    $s->jumlah_masuk
-                ]);
+                    'Masuk',
+                    $m->barang?->obat?->nama_obat ?? '-',
+                    $m->tanggal_masuk,
+                    $m->jumlah_masuk,
+                    $m->keterangan
+                ], ';');
+            }
+
+            foreach ($keluar as $k) {
+                fputcsv($handle, [
+                    'Keluar',
+                    $k->barang?->obat?->nama_obat ?? '-',
+                    $k->created_at->format('Y-m-d'),
+                    $k->jumlah_keluar,
+                    $k->keterangan
+                ], ';');
             }
 
             fclose($handle);
         }, 200, [
-            'Content-Type' => 'text/csv',
+            'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' =>
-            'attachment; filename=laporan_stok_' . now()->format('Ymd_His') . '.csv',
+            'attachment; filename=laporan_transaksi_' . now()->format('Ymd_His') . '.csv',
         ]);
     }
+
 
     public function exportPdf(Request $request)
     {
         $dari   = $request->dari_tanggal;
         $sampai = $request->sampai_tanggal;
 
-        $stokAktif = StokBarang::with(['obat', 'lokasi'])
-            ->where('jumlah_masuk', '>', 0)
+        $barangMasuk = BarangMasuk::with('barang')
             ->when(
                 $dari && $sampai,
-                fn($q) =>
-                $q->whereBetween('tanggal_masuk', [$dari, $sampai])
-            )
-            ->orderBy('tanggal_kadaluarsa')
-            ->get();
+                fn($q) => $q->whereBetween('tanggal_masuk', [$dari, $sampai])
+            )->get();
 
-        return Pdf::loadView('views.admin.laporan_pdf', [
-            'stokAktif' => $stokAktif,
-            'dari' => $dari,
-            'sampai' => $sampai
+        $barangKeluar = BarangKeluar::with('barang')
+            ->when(
+                $dari && $sampai,
+                fn($q) => $q->whereBetween('created_at', [$dari, $sampai])
+            )->get();
+
+        return Pdf::loadView('views.pimpinan.laporan_pdf', [
+            'barangMasuk'  => $barangMasuk,
+            'barangKeluar' => $barangKeluar,
+            'dari'         => $dari,
+            'sampai'       => $sampai
         ])
             ->setPaper('A4', 'landscape')
-            ->download('laporan_stok_' . now()->format('Ymd_His') . '.pdf');
+            ->download('laporan_transaksi_' . now()->format('Ymd_His') . '.pdf');
     }
 }

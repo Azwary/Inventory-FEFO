@@ -11,18 +11,23 @@ use App\Http\Controllers\Pimpinan\LaporanController as PimpinanLaporanController
 use App\Http\Controllers\Pimpinan\NotifikasiController as PimpinanNotifikasiController;
 use App\Http\Controllers\Pimpinan\PengeluaranController as PimpinanPengeluaranController;
 use App\Http\Controllers\Pimpinan\StokController as PimpinanStokController;
+use App\Http\Controllers\Pimpinan\usermanagementController as PimpinanusermanagementController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\usermanagement;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
-    return view('auth.login');
+    return Auth::check()
+
+        ? redirect()->route('dashboard')
+        : redirect()->route('login');
 });
 
 Route::get('/dashboard', function () {
     $user = Auth::user();
 
-    if ($user->role === 'Admin') {
+    if ($user->role === 'Apoteker') {
         return redirect()->route('admin.dashboard');
     }
 
@@ -39,7 +44,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:Apoteker'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('index');
     Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
     Route::get('/stok', [StokController::class, 'index'])->name('stok.index');
@@ -63,6 +68,10 @@ Route::middleware(['auth', 'role:Pimpinan'])->prefix('pimpinan')->name('pimpinan
     Route::get('/laporan', [PimpinanLaporanController::class, 'index'])->name('laporan-audit.index');
     Route::get('/laporan/export/csv', [PimpinanLaporanController::class, 'exportCsv'])->name('laporan-audit.export.csv');
     Route::get('/laporan/export/pdf', [PimpinanLaporanController::class, 'exportPdf'])->name('laporan-audit.export.pdf');
+    Route::get('/usermanagement', [PimpinanusermanagementController::class, 'index'])->name('usermanagement.index');
+    Route::post('/user-management', [PimpinanusermanagementController::class, 'store'])->name('user.store');
+    Route::put('/user-management/{id}', [PimpinanusermanagementController::class, 'update'])->name('user.update');
+    Route::delete('/user-management/{id}', [PimpinanusermanagementController::class, 'destroy'])->name('user.destroy');
 });
 
 Route::get('/test', function () {
@@ -70,3 +79,10 @@ Route::get('/test', function () {
     dd($user);
 });
 require __DIR__ . '/auth.php';
+Route::fallback(function () {
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    }
+
+    return redirect()->route('login');
+});

@@ -29,7 +29,7 @@ class DashboardController extends Controller
             'satuan',
             'lokasi'
         ])
-            ->where('jumlah_masuk', '>', 0)
+            ->where('jumlah_stok', '>', 0)
             ->when(
                 $dari && $sampai,
                 fn($q) => $q->whereBetween('tanggal_masuk', [$dari, $sampai])
@@ -43,12 +43,12 @@ class DashboardController extends Controller
         )->get();
 
         $totalBatch  = $stokAktif->count();
-        $totalStok   = $stokAktif->sum('jumlah_masuk');
-        $totalKeluar = $barangKeluar->sum('jumlah');
+        $totalStok   = $stokAktif->sum('jumlah_stok');
+        $totalKeluar = $barangKeluar->sum('jumlah_keluar');
 
         $stokKeluarBulanan = BarangKeluar::select(
             DB::raw("DATE_FORMAT(created_at, '%Y-%m') as periode"),
-            DB::raw('SUM(jumlah) as total')
+            DB::raw('SUM(jumlah_keluar) as total')
         )
             ->when(
                 $dari && $sampai,

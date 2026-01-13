@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('merek', 50)->nullable();
             $table->string('id_satuan', 5);
             $table->string('id_lokasi', 5);
+            $table->string('id_persediaan', 5);
             $table->string('keterangan', 100)->nullable();
             $table->string('foto_barang', 50)->nullable();
 
@@ -23,6 +24,7 @@ return new class extends Migration
             $table->foreign('id_kategori')->references('id_kategori')->on('kategori')->onDelete('cascade');
             $table->foreign('id_jenis')->references('id_jenis')->on('jenis')->onDelete('cascade');
             $table->foreign('id_satuan')->references('id_satuan')->on('satuan')->onDelete('cascade');
+            $table->foreign('id_persediaan')->references('id_persediaan')->on('persediaan')->onDelete('cascade');
             $table->foreign('id_lokasi')->references('id_lokasi')->on('lokasi')->onDelete('cascade');
             $table->timestamps();
         });

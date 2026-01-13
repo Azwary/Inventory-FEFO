@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Laporan Stok</title>
+    <title>Laporan Transaksi Barang</title>
     <style>
         body {
             font-family: DejaVu Sans, sans-serif;
@@ -45,7 +45,7 @@
 
 <body>
 
-    <h2>LAPORAN STOK AKTIF</h2>
+    <h2>LAPORAN TRANSAKSI BARANG</h2>
 
     <p>
         Periode:
@@ -56,26 +56,47 @@
         <thead>
             <tr>
                 <th>No</th>
+                <th>Jenis</th>
                 <th>Nama Obat</th>
-                <th>No Batch</th>
-                <th>Lokasi</th>
-                <th>Tgl Masuk</th>
-                <th>Exp</th>
+                <th>Tanggal</th>
                 <th>Jumlah</th>
+                <th>Keterangan</th>
             </tr>
         </thead>
         <tbody>
-            @foreach ($stokAktif as $i => $s)
+
+            {{-- BARANG MASUK --}}
+            @foreach ($barangMasuk as $i => $m)
                 <tr>
                     <td>{{ $i + 1 }}</td>
-                    <td>{{ $s->barang->obat?->nama_obat ?? '-' }}</td>
-                    <td>{{ $s->nomor_batch }}</td>
-                    <td>{{ $s->lokasi?->nama_lokasi ?? '-' }}</td>
-                    <td>{{ $s->tanggal_masuk }}</td>
-                    <td>{{ $s->tanggal_kadaluarsa }}</td>
-                    <td>{{ $s->jumlah_masuk }}</td>
+                    <td>Masuk</td>
+                    <td>{{ $m->barang?->obat?->nama_obat ?? '-' }}</td>
+                    <td>{{ $m->tanggal_masuk }}</td>
+                    <td>{{ $m->jumlah_masuk }}</td>
+                    <td>{{ $m->keterangan }}</td>
                 </tr>
             @endforeach
+
+            {{-- BARANG KELUAR --}}
+            @foreach ($barangKeluar as $j => $k)
+                <tr>
+                    <td>{{ $barangMasuk->count() + $j + 1 }}</td>
+                    <td>Keluar</td>
+                    <td>{{ $k->barang?->obat?->nama_obat ?? '-' }}</td>
+                    <td>{{ $k->created_at->format('Y-m-d') }}</td>
+                    <td>{{ $k->jumlah_keluar }}</td>
+                    <td>{{ $k->keterangan }}</td>
+                </tr>
+            @endforeach
+
+            @if ($barangMasuk->isEmpty() && $barangKeluar->isEmpty())
+                <tr>
+                    <td colspan="6" style="text-align:center">
+                        Tidak ada data transaksi
+                    </td>
+                </tr>
+            @endif
+
         </tbody>
     </table>
 

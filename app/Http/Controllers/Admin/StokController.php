@@ -27,37 +27,49 @@ class StokController extends Controller
 
         $rakStoks = StokBarang::select(
             'id_lokasi',
-            DB::raw('COUNT(*) AS jumlah_item'),
+
             DB::raw("
-                SUM(
-                    CASE
-                        WHEN tanggal_kadaluarsa IS NOT NULL
-                        AND tanggal_kadaluarsa BETWEEN CURDATE()
-                        AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)
-                        THEN 1 ELSE 0
-                    END
-                ) AS warning_item
-            ")
+            SUM(
+                CASE
+                    WHEN jumlah_stok > 0 THEN 1
+                    ELSE 0
+                END
+            ) AS jumlah_item
+        "),
+
+            DB::raw("
+            SUM(
+                CASE
+                    WHEN jumlah_stok > 0
+                    AND tanggal_kadaluarsa IS NOT NULL
+                    AND tanggal_kadaluarsa BETWEEN CURDATE()
+                    AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS warning_item
+        ")
         )
             ->with('lokasi')
             ->groupBy('id_lokasi')
             ->get();
 
         $stoks = StokBarang::with([
-            'obat',
-            'jenis',
-            'kategori',
-            'satuan',
+            'barang.obat',
+            'barang.jenis',
+            'barang.kategori',
+            'barang.satuan',
             'lokasi'
         ])
             ->when($search, function ($query) use ($search) {
-                $query->whereHas('obat', function ($q) use ($search) {
+                $query->whereHas('barang.obat', function ($q) use ($search) {
                     $q->where('nama_obat', 'like', "%{$search}%");
                 })
                     ->orWhere('nomor_batch', 'like', "%{$search}%");
             })
             ->orderBy('tanggal_kadaluarsa', $orderExp)
             ->get();
+
 
         $obats = Obat::select('id_obat', 'nama_obat')->get();
         $jeniss = Jenis::select('id_jenis', 'nama_jenis')->get();
@@ -122,12 +134,9 @@ class StokController extends Controller
         $IdBarang        = $this->generateId(new Barang(), 'id_barang', 'BR', 3);
         $IdStok          = $this->generateId(new StokBarang(), 'id_stok', 'STB', 2);
         $IdBarangMasuk   = $this->generateId(new BarangMasuk(), 'id_masuk', 'BRM', 2);
-        $IdTrBarangMasuk = $this->generateId(new TrBarangMasuk(), 'id_tr_masuk', 'TR', 3);
         $IdPersediaan    = $this->generateId(new Persediaan(), 'id_persediaan', 'PR', 3);
 
         $NoBatch = $this->generateId(new StokBarang(), 'nomor_batch', 'NB', 3);
-
-
 
         $barangData = [
             'id_barang' => $IdBarang,
@@ -135,10 +144,10 @@ class StokController extends Controller
             'id_jenis' => $request->jenis,
             'id_kategori' => $request->kategori,
             'id_satuan' => $request->satuan,
+            'id_persediaan' => $IdPersediaan,
             'id_lokasi' => $request->lokasi,
         ];
         Barang::create($barangData);
-
 
         $stokData = [
             'id_stok' => $IdStok,
@@ -147,26 +156,19 @@ class StokController extends Controller
             'nomor_batch' => $NoBatch,
             'tanggal_masuk' => $request->tanggal_masuk,
             'tanggal_kadaluarsa' => $request->tanggal_exp,
-            'jumlah_masuk' => $request->jumlah,
+            'jumlah_stok' => $request->jumlah,
         ];
         StokBarang::create($stokData);
-
 
         $barangMasukData = [
             'id_masuk' => $IdBarangMasuk,
             'id_barang' => $IdBarang,
             'tanggal_masuk' => $request->tanggal_masuk,
             'id_user' => Auth::user()->id,
+            'jumlah_masuk' => $request->jumlah,
+            'keterangan' => "Pembelian",
         ];
         BarangMasuk::create($barangMasukData);
-
-
-        $trMasukData = [
-            'id_tr_masuk' => $IdTrBarangMasuk,
-            'jml_barang_masuk' => $request->jumlah,
-        ];
-        TrBarangMasuk::create($trMasukData);
-
 
         $lastPersediaan = Persediaan::orderBy('id_persediaan', 'desc')->first();
         $stokLama = $lastPersediaan ? $lastPersediaan->stok_barang : 0;

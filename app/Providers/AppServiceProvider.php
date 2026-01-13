@@ -22,16 +22,21 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot()
+    public function boot(): void
     {
-
         View::composer('*', function ($view) {
+
             $notifications = StokBarang::select(
                 '*',
                 DB::raw('DATEDIFF(tanggal_kadaluarsa, CURDATE()) AS sisa_hari')
             )
+                ->where('jumlah_stok', '>', 0)
                 ->whereNotNull('tanggal_kadaluarsa')
-                ->whereBetween('tanggal_kadaluarsa', [now(), now()->addDays(30)])
+                ->whereBetween('tanggal_kadaluarsa', [
+                    now()->toDateString(),
+                    now()->addDays(30)->toDateString()
+                ])
+                ->orderBy('tanggal_kadaluarsa', 'asc')
                 ->get();
 
             $view->with('notifications', $notifications);

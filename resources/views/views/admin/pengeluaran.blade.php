@@ -3,10 +3,10 @@
 @section('title', 'Transaksi Pengeluaran Obat')
 
 @section('content')
-    <div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg shadow text-white mb-6">
+    {{-- <div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg shadow text-white mb-6">
         <h2 class="text-2xl font-bold">Transaksi Pengeluaran Obat</h2>
         <p class="text-sm opacity-90">Informasi Transaksi Pengeluaran Obat</p>
-    </div>
+    </div> --}}
 
     <div class="p-6 bg-white rounded-lg shadow">
         <p class="mb-4 text-gray-600">
@@ -23,9 +23,10 @@
                     <select name="nama_obat" id="nama_obat" class="border rounded px-3 py-2 w-full mt-2" required>
                         <option value="" disabled selected>Pilih Obat..</option>
                         @foreach ($stoks as $stok)
-                            <option value="{{ $stok->id_stok }}" data-stok="{{ $stok->jumlah_masuk }}"
-                                data-batch="{{ $stok->nomor_batch }}" data-exp="{{ $stok->tanggal_kadaluarsa }}"
-                                {{ old('nama_obat') == $stok->id_stok ? 'selected' : '' }}>
+                            <option value="{{ $stok->id_stok }}"
+                                data-nama="{{ optional($stok->barang)->obat?->nama_obat ?? '-' }}"
+                                data-stok="{{ $stok->jumlah_stok }}" data-batch="{{ $stok->nomor_batch }}"
+                                data-exp="{{ $stok->tanggal_kadaluarsa }}">
                                 {{ optional($stok->barang)->obat?->nama_obat ?? '-' }}
                                 (Exp: {{ $stok->tanggal_kadaluarsa }})
                             </option>
@@ -66,6 +67,10 @@
                 <b id="info-exp">-</b>
             </div>
 
+            <small class="mt-1 block ">
+                <p class="font-bold text-base">Batch Rekomendasi FEFO:</p>
+                <span id="rekomendasi-obat" class="font-semibold">-</span>
+            </small>
 
             <div class="flex justify-end mt-4">
                 <button type="submit" class="border rounded px-4 py-2 bg-blue-500 text-white hover:bg-blue-600">
@@ -73,6 +78,42 @@
                 </button>
             </div>
         </form>
+        @if (isset($historiKeluar) && $historiKeluar->count())
+            <div class="mt-4 bg-white rounded-lg shadow p-4">
+                <h3 class="font-semibold text-gray-700 mb-3">
+                    Histori Transaksi Pengeluaran
+                </h3>
+                <div class="h-44 overflow-y-auto border rounded scroll-smooth">
+                    @foreach ($historiKeluar as $h)
+                        <div class="px-4 py-3 border-b last:border-b-0 hover:bg-gray-50">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="font-semibold text-gray-800">
+                                        {{ $h->barang?->obat?->nama_obat ?? '-' }}
+                                    </p>
+                                    <p class="text-sm text-gray-600">
+                                        {{ $h->keterangan }}
+                                    </p>
+                                    <p class="text-xs text-gray-500">
+                                        {{ $h->created_at->format('d/m/Y H:i') }}
+                                    </p>
+                                </div>
+
+                                <div class="text-right">
+                                    <span class="text-red-600 font-bold">
+                                        -{{ $h->jumlah_keluar }}
+                                    </span>
+                                    <p class="text-xs text-gray-500">
+                                        Sisa stok: {{ $h->sisa_stok_transaksi }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
     </div>
 
 
@@ -82,6 +123,42 @@
         const batchText = document.getElementById('info-batch');
         const expText = document.getElementById('info-exp');
         const jumlahInput = document.getElementById('jumlah_pengeluaran');
+        const rekomendasiText = document.getElementById('rekomendasi-obat');
+
+        function getRekomendasiFEFO() {
+            const today = new Date();
+            let kandidat = null;
+            let selisihTerkecil = Infinity;
+
+            Array.from(obatSelect.options).forEach(option => {
+                if (!option.dataset.exp) return;
+
+                const expDate = new Date(option.dataset.exp);
+                const diffTime = expDate - today;
+                const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+                if (diffDays >= 0 && diffDays <= 30) {
+                    if (diffDays < selisihTerkecil) {
+                        selisihTerkecil = diffDays;
+                        kandidat = option;
+                    }
+                }
+            });
+
+            if (kandidat) {
+                rekomendasiText.innerHTML =
+                    kandidat.dataset.batch + " - " +
+                    kandidat.dataset.nama + "<br>" +
+                    "Tgl Kadaluarsa: <span class='text-red-600'>" +
+                    kandidat.dataset.exp +
+                    "</span>" +
+                    "<br>" + "Sisa Stok Batch : " +
+                    kandidat.dataset.stok + "";
+            } else {
+                rekomendasiText.innerText = 'Tidak ada batch FEFO dalam 30 hari';
+            }
+
+        }
 
         obatSelect.addEventListener('change', function() {
             const option = this.options[this.selectedIndex];
@@ -96,5 +173,9 @@
 
             jumlahInput.max = stok;
         });
+
+        getRekomendasiFEFO();
     </script>
+
+
 @endsection
