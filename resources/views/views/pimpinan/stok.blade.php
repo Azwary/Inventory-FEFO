@@ -3,10 +3,10 @@
 @section('title', 'Persediaan / Stok Obat')
 
 @section('content')
-    <div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg shadow text-white mb-6">
+    {{-- <div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg shadow text-white mb-6">
         <h2 class="text-2xl font-bold">Persediaan / Stok Obat</h2>
         <p class="text-sm opacity-90">Informasi Persediaan / Stok Obat</p>
-    </div>
+    </div> --}}
 
     <div class="p-6 bg-white rounded-lg shadow">
 

@@ -17,7 +17,7 @@
     </div>
 
     <!-- Menu Admin -->
-    @if (auth()->user()->role === 'Admin')
+    @if (auth()->user()->role === 'Apoteker')
         <nav class="mt-6 flex flex-col gap-4 px-4">
             <a href="{{ route('admin.dashboard') }}"
                 class="block px-4 py-2 hover:bg-gray-200 {{ request()->routeIs('admin.dashboard') ? 'bg-gray-200 font-bold' : '' }}">
@@ -60,6 +60,10 @@
             <a href="{{ route('pimpinan.laporan-audit.index') }}"
                 class="block px-4 py-2 hover:bg-gray-200 {{ request()->routeIs('pimpinan.laporan-audit.index') ? 'bg-gray-200 font-bold' : '' }}">
                 Laporan & Audit
+            </a>
+            <a href="{{ route('pimpinan.usermanagement.index') }}"
+                class="block px-4 py-2 hover:bg-gray-200 {{ request()->routeIs('pimpinan.usermanagement.index') ? 'bg-gray-200 font-bold' : '' }}">
+                Pengguna
             </a>
         </nav>
     @endif

@@ -3,10 +3,10 @@
 @section('title', 'Dashboard Admin')
 
 @section('content')
-    <div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg shadow text-white mb-6">
+    {{-- <div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg shadow text-white mb-6">
         <h2 class="text-2xl font-bold">Dashboard</h2>
         <p class="text-sm opacity-90">Dashboard Admin</p>
-    </div>
+    </div> --}}
 
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">

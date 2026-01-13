@@ -18,7 +18,7 @@ return new class extends Migration
             // $table->string('email')->unique();
             // $table->timestamp('email_verified_at')->nullable();
             $table->string('password', 255);
-            $table->enum('role', ['Admin', 'Pimpinan'])->default('admin');
+            $table->enum('role', ['Apoteker', 'Pimpinan'])->default('Apoteker');
             // $table->rememberToken();
             $table->timestamps();
         });
@@ -29,7 +29,7 @@ return new class extends Migration
             $table->timestamp('created_at')->nullable();
         });
 
-       Schema::create('sessions', function (Blueprint $table) {
+        Schema::create('sessions', function (Blueprint $table) {
             $table->string('id', 191)->primary();
             $table->foreignId('user_id')->nullable()->index();
             $table->string('ip_address', 45)->nullable();
@@ -37,7 +37,6 @@ return new class extends Migration
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
-
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\BarangKeluar;
+use App\Models\BarangMasuk;
 use App\Models\Persediaan;
 use App\Models\StokBarang;
 use App\Models\TrBarangKeluar;
@@ -15,18 +16,39 @@ class PengeluaranController extends Controller
 {
     public function index()
     {
-        $stoks = StokBarang::with([
-            'obat',
-            'jenis',
-            'kategori',
-            'satuan',
-            'lokasi'
-        ])
+        $stoks = StokBarang::with('barang.obat')
             ->where('jumlah_stok', '>', 0)
-            ->orderBy('tanggal_kadaluarsa', 'asc')
+            ->orderBy('tanggal_kadaluarsa')
             ->get();
 
-        return view('views.admin.pengeluaran', compact('stoks'));
+        // Ambil histori transaksi KELUAR urut waktu (PENTING)
+        $historiKeluar = BarangKeluar::with('barang.obat')
+            ->orderBy('created_at', 'asc')
+            ->get()
+            ->groupBy('id_barang')
+            ->flatMap(function ($transaksiPerBarang) {
+
+                // total masuk sebagai stok awal
+                $stokAwal = \App\Models\BarangMasuk::where(
+                    'id_barang',
+                    $transaksiPerBarang->first()->id_barang
+                )->sum('jumlah_masuk');
+
+                $sisa = $stokAwal;
+
+                return $transaksiPerBarang->map(function ($trx) use (&$sisa) {
+                    $sisa -= $trx->jumlah_keluar;
+                    $trx->sisa_stok_transaksi = $sisa;
+                    return $trx;
+                });
+            })
+            ->sortByDesc('created_at')
+            ->values();
+
+        return view('views.admin.pengeluaran', compact(
+            'stoks',
+            'historiKeluar'
+        ));
     }
 
 

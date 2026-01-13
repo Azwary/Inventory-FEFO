@@ -3,10 +3,10 @@
 @section('title', 'Notifikasi Kekadaluarsaan')
 
 @section('content')
-    <div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg shadow text-white mb-6">
+    {{-- <div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg shadow text-white mb-6">
         <h2 class="text-2xl font-bold">Notifikasi Kekadaluarsaan</h2>
         <p class="text-sm opacity-90">Informasi Kekadaluarsaan Obat</p>
-    </div>
+    </div> --}}
 
     <div class="p-6 bg-white rounded-lg shadow mb-4">
         <h2 class="font-bold mb-4">Daftar Batch Kritis (FEFO Alert)</h2>

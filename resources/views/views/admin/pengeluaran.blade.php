@@ -3,10 +3,10 @@
 @section('title', 'Transaksi Pengeluaran Obat')
 
 @section('content')
-    <div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg shadow text-white mb-6">
+    {{-- <div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg shadow text-white mb-6">
         <h2 class="text-2xl font-bold">Transaksi Pengeluaran Obat</h2>
         <p class="text-sm opacity-90">Informasi Transaksi Pengeluaran Obat</p>
-    </div>
+    </div> --}}
 
     <div class="p-6 bg-white rounded-lg shadow">
         <p class="mb-4 text-gray-600">
@@ -78,6 +78,42 @@
                 </button>
             </div>
         </form>
+        @if (isset($historiKeluar) && $historiKeluar->count())
+            <div class="mt-4 bg-white rounded-lg shadow p-4">
+                <h3 class="font-semibold text-gray-700 mb-3">
+                    Histori Transaksi Pengeluaran
+                </h3>
+                <div class="h-44 overflow-y-auto border rounded scroll-smooth">
+                    @foreach ($historiKeluar as $h)
+                        <div class="px-4 py-3 border-b last:border-b-0 hover:bg-gray-50">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="font-semibold text-gray-800">
+                                        {{ $h->barang?->obat?->nama_obat ?? '-' }}
+                                    </p>
+                                    <p class="text-sm text-gray-600">
+                                        {{ $h->keterangan }}
+                                    </p>
+                                    <p class="text-xs text-gray-500">
+                                        {{ $h->created_at->format('d/m/Y H:i') }}
+                                    </p>
+                                </div>
+
+                                <div class="text-right">
+                                    <span class="text-red-600 font-bold">
+                                        -{{ $h->jumlah_keluar }}
+                                    </span>
+                                    <p class="text-xs text-gray-500">
+                                        Sisa stok: {{ $h->sisa_stok_transaksi }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
     </div>
 
 
