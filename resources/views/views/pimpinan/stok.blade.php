@@ -78,11 +78,24 @@
                 @foreach ($rakStoks as $rak)
                     @php
                         $isKosong = $rak->jumlah_item == 0;
-                        $isWarning = $rak->warning_item > 0;
+                        $isExpired = $rak->expired_item > 0;
+                        $isWarning = !$isExpired && $rak->warning_item > 0;
 
-                        $border = $isKosong ? 'border-gray-300' : ($isWarning ? 'border-red-400' : 'border-green-400');
+                        $border = $isKosong
+                            ? 'border-gray-300'
+                            : ($isExpired
+                                ? 'border-red-600'
+                                : ($isWarning
+                                    ? 'border-orange-400'
+                                    : 'border-green-400'));
 
-                        $bg = $isKosong ? 'bg-gray-50' : ($isWarning ? 'bg-red-50' : 'bg-green-50');
+                        $bg = $isKosong
+                            ? 'bg-gray-50'
+                            : ($isExpired
+                                ? 'bg-red-100'
+                                : ($isWarning
+                                    ? 'bg-orange-50'
+                                    : 'bg-green-50'));
 
                         $badge = $isKosong
                             ? 'bg-gray-200 text-gray-600'
@@ -107,20 +120,25 @@
 
 
                         <div class="mt-2">
-                            @if ($isWarning)
-                                <span class="text-xs font-semibold px-2 py-1 rounded-full {{ $badge }}">
+                            @if ($isExpired)
+                                <span class="text-xs font-semibold px-2 py-1 rounded-full bg-red-200 text-red-800">
+                                    EXPIRED
+                                </span>
+                            @elseif ($isWarning)
+                                <span class="text-xs font-semibold px-2 py-1 rounded-full bg-orange-200 text-orange-800">
                                     {{ $rak->warning_item }} Item Warning
                                 </span>
                             @elseif ($isKosong)
-                                <span class="text-xs font-semibold px-2 py-1 rounded-full {{ $badge }}">
+                                <span class="text-xs font-semibold px-2 py-1 rounded-full bg-gray-200 text-gray-600">
                                     Rak Kosong
                                 </span>
                             @else
-                                <span class="text-xs font-semibold px-2 py-1 rounded-full {{ $badge }}">
+                                <span class="text-xs font-semibold px-2 py-1 rounded-full bg-green-200 text-green-700">
                                     Aman
                                 </span>
                             @endif
                         </div>
+
                     </div>
                 @endforeach
             </div>

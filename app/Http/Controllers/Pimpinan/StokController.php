@@ -21,34 +21,55 @@ class StokController extends Controller
         $orderExp = $request->get('exp', 'asc');
         $search   = $request->get('search');
 
+        $today = Carbon::today()->startOfDay();
+        $warningDate = Carbon::today()->addDays(30)->endOfDay();
+
         $rakStoks = StokBarang::select(
             'id_lokasi',
 
             DB::raw("
-            SUM(
-                CASE
-                    WHEN jumlah_stok> 0 THEN 1
-                    ELSE 0
-                END
-            ) AS jumlah_item
-        "),
+        SUM(
+            CASE
+                WHEN jumlah_stok > 0 THEN jumlah_stok
+                ELSE 0
+            END
+        ) AS jumlah_item
+    "),
 
             DB::raw("
-            SUM(
-                CASE
-                    WHEN jumlah_stok > 0
-                    AND tanggal_kadaluarsa IS NOT NULL
-                    AND tanggal_kadaluarsa BETWEEN CURDATE()
-                    AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)
-                    THEN 1
-                    ELSE 0
-                END
-            ) AS warning_item
-        ")
+        SUM(
+            CASE
+                WHEN jumlah_stok > 0
+                AND tanggal_kadaluarsa IS NOT NULL
+                AND tanggal_kadaluarsa < ?
+                THEN 1
+                ELSE 0
+            END
+        ) AS expired_item
+    "),
+
+            DB::raw("
+        SUM(
+            CASE
+                WHEN jumlah_stok > 0
+                AND tanggal_kadaluarsa IS NOT NULL
+                AND tanggal_kadaluarsa >= ?
+                AND tanggal_kadaluarsa <= ?
+                THEN 1
+                ELSE 0
+            END
+        ) AS warning_item
+    ")
         )
             ->with('lokasi')
             ->groupBy('id_lokasi')
+            ->addBinding([
+                $today->toDateString(),
+                $today->toDateString(),
+                $warningDate->toDateString(),
+            ], 'select')
             ->get();
+
 
         $stoks = StokBarang::with([
             'barang.obat',
@@ -73,7 +94,7 @@ class StokController extends Controller
         $satuans = Satuan::select('id_satuan', 'nama_satuan')->get();
         $lokasis = Lokasi::select('id_lokasi', 'nama_lokasi')->get();
 
-        return view('views.pimpinan.stok', compact(
+        return view('views.admin.stok', compact(
             'rakStoks',
             'stoks',
             'obats',
