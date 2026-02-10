@@ -11,58 +11,72 @@
     <div class="p-6 bg-white rounded-lg shadow">
 
 
-        <form method="GET"
+        @php
+            $currentExp = request('exp', 'asc');
+            $nextExp = $currentExp === 'asc' ? 'desc' : 'asc';
+        @endphp
+
+        <div
             class="mb-5 p-4 bg-white rounded-xl shadow-sm border
-           flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-3 w-full">
+           flex flex-col lg:flex-row items-stretch lg:items-center gap-3 w-full">
 
+            {{-- ================= LEFT : SEARCH + FEFO ================= --}}
+            <form method="GET" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
 
-            <div class="relative w-full sm:w-1/3">
-                <span class="absolute inset-y-0 left-3 flex items-center text-gray-400">
+                {{-- SEARCH --}}
+                <div class="relative w-full sm:w-64">
+                    <span class="absolute inset-y-0 left-3 flex items-center text-gray-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M21 21l-4.35-4.35m1.1-5.4a7.5 7.5 0 11-15 0 7.5 7.5 0 0115 0z" />
+                        </svg>
+                    </span>
 
-                </span>
-                <input type="text" name="search" value="{{ request('search') }}"
-                    placeholder="Cari nama obat atau nomor batch..."
-                    class="w-full pl-10 pr-3 py-2 border rounded-lg
-                   focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                    <input type="text" name="search" value="{{ request('search') }}"
+                        placeholder="Cari nama obat / batch..."
+                        class="w-full pl-10 pr-3 py-2 border rounded-lg
+                       focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                </div>
+
+                {{-- BUTTON CARI --}}
+                <button type="submit"
+                    class="flex items-center justify-center gap-2
+                   bg-green-600 text-white px-5 py-2 rounded-lg
+                   hover:bg-green-700 transition
+                   w-full sm:w-auto">
+                    Cari
+                </button>
+
+                {{-- BUTTON FEFO --}}
+                <a href="{{ request()->fullUrlWithQuery(['exp' => $nextExp, 'page' => 1]) }}"
+                    class="flex items-center justify-center gap-2
+                   px-5 py-2 rounded-lg border font-semibold
+                   {{ $currentExp === 'asc'
+                       ? 'bg-orange-50 border-orange-300 text-orange-700'
+                       : 'bg-blue-50 border-blue-300 text-blue-700' }}
+                   hover:opacity-80 transition
+                   w-full sm:w-auto">
+
+                    FEFO
+                    <span class="text-xs font-bold">
+                        {{ strtoupper($currentExp) }}
+                    </span>
+                </a>
+            </form>
+
+            {{-- ================= RIGHT : TAMBAH ================= --}}
+            <div class="lg:ml-auto">
+                <button type="button" onclick="openModal('addModal')"
+                    class="flex items-center justify-center gap-2
+                   bg-blue-600 text-white px-5 py-2 rounded-lg
+                   hover:bg-blue-700 transition shadow
+                   w-full sm:w-auto">
+                    Tambah Obat Masuk
+                </button>
             </div>
 
-            @php
-                $currentExp = request('exp', 'asc');
-                $nextExp = $currentExp === 'asc' ? 'desc' : 'asc';
-            @endphp
+        </div>
 
-
-            <button type="submit"
-                class="flex items-center justify-center gap-2
-               bg-green-600 text-white px-4 py-2 rounded-lg
-               hover:bg-green-700 transition w-full sm:w-auto">
-                <span>Cari</span>
-            </button>
-
-
-            <a href="{{ request()->fullUrlWithQuery(['exp' => $nextExp]) }}"
-                class="flex items-center justify-center gap-2
-               px-4 py-2 rounded-lg border
-               {{ $currentExp === 'asc'
-                   ? 'bg-orange-50 border-orange-300 text-orange-700'
-                   : 'bg-blue-50 border-blue-300 text-blue-700' }}
-               hover:opacity-80 transition w-full sm:w-auto">
-
-                FEFO
-                <span class="text-xs font-semibold">
-                    {{ strtoupper($currentExp) }}
-                </span>
-            </a>
-
-
-            <button type="button" onclick="openModal('addModal')"
-                class="sm:ml-auto flex items-center justify-center gap-2
-               bg-blue-600 text-white px-5 py-2 rounded-lg
-               hover:bg-blue-700 transition shadow-md w-full sm:w-auto">
-
-                <span>Tambah Obat Masuk</span>
-            </button>
-        </form>
 
         <div class="mb-6">
             <h3 class="font-semibold mb-3 flex items-center gap-2">
@@ -145,25 +159,95 @@
         </div>
 
         <div class="bg-white rounded-lg shadow overflow-x-auto">
+            <div class="flex justify-between items-center mb-4">
+                <form method="GET" class="flex items-center gap-2">
+                    <span class="text-sm">Tampilkan</span>
+
+                    <select name="per_page" onchange="this.form.submit()" class="border rounded px-2 py-1 text-sm">
+                        @foreach ([5, 10, 25, 50] as $n)
+                            <option value="{{ $n }}" {{ request('per_page', 10) == $n ? 'selected' : '' }}>
+                                {{ $n }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    <span class="text-sm">data</span>
+
+                    <input type="hidden" name="search" value="{{ request('search') }}">
+                    <input type="hidden" name="exp" value="{{ request('exp') }}">
+                </form>
+
+                <div class="text-sm text-gray-500">
+                    {{ $stoks->firstItem() }} - {{ $stoks->lastItem() }}
+                    dari {{ $stoks->total() }} data
+                </div>
+            </div>
+            @php
+                function sortLink($label, $column)
+                {
+                    $currentSort = request('sort');
+                    $currentDir = request('direction', 'asc');
+
+                    // 🔑 INI YANG KEMARIN KURANG
+                    $isActive = $currentSort === $column;
+
+                    // arah sort berikutnya
+                    $nextDir = $isActive && $currentDir === 'asc' ? 'desc' : 'asc';
+
+                    $url = request()->fullUrlWithQuery([
+                        'sort' => $column,
+                        'direction' => $nextDir,
+                        'page' => 1,
+                    ]);
+
+                    // ICON
+                    if ($isActive) {
+                        $icon = $currentDir === 'asc' ? '▲' : '▼';
+                        $color = 'text-blue-600';
+                    } else {
+                        $icon = '⇅'; // standby
+                        $color = 'text-gray-400';
+                    }
+
+                    return '
+        <a href="' .
+                        $url .
+                        '"
+           class="flex items-center justify-center gap-1 hover:text-blue-600">
+            <span>' .
+                        $label .
+                        '</span>
+            <span class="' .
+                        $color .
+                        '">' .
+                        $icon .
+                        '</span>
+        </a>
+    ';
+                }
+            @endphp
+
+
             <table class="min-w-full border border-gray-300 table-auto text-center">
                 <thead class="bg-gray-100 text-gray-700">
                     <tr>
                         <th class="border px-3 py-2">KODE</th>
-                        <th class="border px-3 py-2">NAMA OBAT</th>
+                        <th class="border px-3 py-2">{!! sortLink('NAMA OBAT', 'nama_obat') !!}</th>
                         <th class="border px-3 py-2">BATCH</th>
-                        <th class="border px-3 py-2">TANGGAL MASUK</th>
-                        <th class="border px-3 py-2">TANGGAL EXP</th>
-                        <th class="border px-3 py-2">JUMLAH</th>
-                        <th class="border px-3 py-2">LOKASI</th>
+                        <th class="border px-3 py-2">{!! sortLink('TGL MASUK', 'tanggal_masuk') !!}</th>
+                        <th class="border px-3 py-2">{!! sortLink('TGL EXP', 'tanggal_kadaluarsa') !!}</th>
+                        <th class="border px-3 py-2">{!! sortLink('JUMLAH', 'jumlah_stok') !!}</th>
+                        <th class="border px-3 py-2">{!! sortLink('LOKASI', 'nama_lokasi') !!}</th>
+
                         <th class="border px-3 py-2">AKSI</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @php
+                    {{-- @php
                         $filteredStoks = $stoks->where('jumlah_stok', '>', 0);
-                    @endphp
+                    @endphp --}}
 
-                    @if ($filteredStoks->isEmpty())
+                    @if ($stoks->isEmpty())
                         <tr>
                             <td colspan="8" class="py-10 text-center text-gray-500">
                                 @if (request('search'))
@@ -180,7 +264,7 @@
                             </td>
                         </tr>
                     @else
-                        @foreach ($filteredStoks as $stok)
+                        @foreach ($stoks as $stok)
                             <tr class="hover:bg-gray-50">
                                 <td class="border px-3 py-2">{{ $stok->id_stok }}</td>
                                 <td class="border px-3 py-2">
@@ -293,6 +377,11 @@
 
 
             </table>
+            <div class="mt-6 border-t pt-3">
+                {{ $stoks->links('views.pagination.clean') }}
+            </div>
+
+
         </div>
     </div>
 
