@@ -13,6 +13,7 @@ return new class extends Migration
             $table->string('id_obat', 5);
             $table->string('id_jenis', 5);
             $table->string('id_kategori', 5);
+            $table->string('dosis', 10)->nullable();
             $table->string('merek', 50)->nullable();
             $table->string('id_satuan', 5);
             $table->string('id_lokasi', 5);

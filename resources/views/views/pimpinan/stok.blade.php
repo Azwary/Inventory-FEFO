@@ -145,25 +145,93 @@
         </div>
 
         <div class="bg-white rounded-lg shadow overflow-x-auto">
+            <div class="flex justify-between items-center mb-4">
+                <form method="GET" class="flex items-center gap-2">
+                    <span class="text-sm">Tampilkan</span>
+
+                    <select name="per_page" onchange="this.form.submit()" class="border rounded px-2 py-1 text-sm">
+                        @foreach ([5, 10, 25, 50] as $n)
+                            <option value="{{ $n }}" {{ request('per_page', 10) == $n ? 'selected' : '' }}>
+                                {{ $n }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    <span class="text-sm">data</span>
+
+                    <input type="hidden" name="search" value="{{ request('search') }}">
+                    <input type="hidden" name="exp" value="{{ request('exp') }}">
+                </form>
+
+                <div class="text-sm text-gray-500">
+                    {{ $stoks->firstItem() }} - {{ $stoks->lastItem() }}
+                    dari {{ $stoks->total() }} data
+                </div>
+            </div>
+            @php
+                function sortLink($label, $column)
+                {
+                    $currentSort = request('sort');
+                    $currentDir = request('direction', 'asc');
+
+                    $isActive = $currentSort === $column;
+
+                    $nextDir = $isActive && $currentDir === 'asc' ? 'desc' : 'asc';
+
+                    $url = request()->fullUrlWithQuery([
+                        'sort' => $column,
+                        'direction' => $nextDir,
+                        'page' => 1,
+                    ]);
+
+                    if ($isActive) {
+                        $icon = $currentDir === 'asc' ? '▲' : '▼';
+                        $color = 'text-blue-600';
+                    } else {
+                        $icon = '⇅';
+                        $color = 'text-gray-400';
+                    }
+
+                    return '
+        <a href="' .
+                        $url .
+                        '"
+           class="flex items-center justify-center gap-1 hover:text-blue-600">
+            <span>' .
+                        $label .
+                        '</span>
+            <span class="' .
+                        $color .
+                        '">' .
+                        $icon .
+                        '</span>
+        </a>
+    ';
+                }
+            @endphp
+
+
             <table class="min-w-full border border-gray-300 table-auto text-center">
                 <thead class="bg-gray-100 text-gray-700">
                     <tr>
                         <th class="border px-3 py-2">KODE</th>
-                        <th class="border px-3 py-2">NAMA OBAT</th>
+                        <th class="border px-3 py-2">{!! sortLink('NAMA OBAT', 'nama_obat') !!}</th>
                         <th class="border px-3 py-2">BATCH</th>
-                        <th class="border px-3 py-2">TANGGAL MASUK</th>
-                        <th class="border px-3 py-2">TANGGAL EXP</th>
-                        <th class="border px-3 py-2">JUMLAH</th>
-                        <th class="border px-3 py-2">LOKASI</th>
+                        <th class="border px-3 py-2">{!! sortLink('TGL MASUK', 'tanggal_masuk') !!}</th>
+                        <th class="border px-3 py-2">{!! sortLink('TGL EXP', 'tanggal_kadaluarsa') !!}</th>
+                        <th class="border px-3 py-2">DOSIS</th>
+                        <th class="border px-3 py-2">{!! sortLink('JUMLAH', 'jumlah_stok') !!}</th>
+                        <th class="border px-3 py-2">{!! sortLink('LOKASI', 'nama_lokasi') !!}</th>
+
                         <th class="border px-3 py-2">AKSI</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @php
+                    {{-- @php
                         $filteredStoks = $stoks->where('jumlah_stok', '>', 0);
-                    @endphp
+                    @endphp --}}
 
-                    @if ($filteredStoks->isEmpty())
+                    @if ($stoks->isEmpty())
                         <tr>
                             <td colspan="8" class="py-10 text-center text-gray-500">
                                 @if (request('search'))
@@ -180,7 +248,7 @@
                             </td>
                         </tr>
                     @else
-                        @foreach ($filteredStoks as $stok)
+                        @foreach ($stoks as $stok)
                             <tr class="hover:bg-gray-50">
                                 <td class="border px-3 py-2">{{ $stok->id_stok }}</td>
                                 <td class="border px-3 py-2">
@@ -189,6 +257,7 @@
                                 <td class="border px-3 py-2">{{ $stok->nomor_batch }}</td>
                                 <td class="border px-3 py-2">{{ $stok->tanggal_masuk }}</td>
                                 <td class="border px-3 py-2">{{ $stok->tanggal_kadaluarsa ?? '-' }}</td>
+                                <td class="border px-3 py-2">{{ $stok->barang->dosis ?? '-' }}</td>
                                 <td class="border px-3 py-2 font-semibold text-green-700">
                                     {{ $stok->jumlah_stok }}
                                 </td>
@@ -203,7 +272,7 @@
 
                             <!-- MODAL DETAIL -->
                             <div id="detailModal{{ $stok->id_stok }}"
-                                class="fixed inset-0 bg-black/50 hidden flex border-black  items-center justify-center p-4 z-50">
+                                class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
 
                                 <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
 
@@ -293,9 +362,13 @@
 
 
             </table>
+            <div class="mt-6 border-t pt-3">
+                {{ $stoks->links('views.pagination.clean') }}
+            </div>
+
+
         </div>
     </div>
-
 
 
     <script>

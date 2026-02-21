@@ -29,6 +29,7 @@
                                 data-exp="{{ $stok->tanggal_kadaluarsa }}">
                                 {{ optional($stok->barang)->obat?->nama_obat ?? '-' }}
                                 (Exp: {{ $stok->tanggal_kadaluarsa }})
+                                (Rak: {{ $stok->lokasi->nama_lokasi ?? '-' }})
                             </option>
                         @endforeach
                     </select>
@@ -36,8 +37,6 @@
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
-
-
                 <div class="flex-1">
                     <label class="block font-medium mb-1" for="jumlah_pengeluaran">
                         Jumlah Pengeluaran
@@ -116,7 +115,23 @@
 
     </div>
 
-
+    <!-- Modal FEFO Warning -->
+    <div id="fefo-modal" class="fixed inset-0 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-lg w-96 p-6">
+            <h2 class="text-lg font-bold text-red-600 mb-3">
+                ⚠️ Peringatan FEFO
+            </h2>
+            <p class="text-gray-700 mb-4">
+                Ada obat yang sama dengan exp sebentar lagi!
+                Silakan gunakan batch yang lebih mendekati dengan tanggal kadaluarsa.
+            </p>
+            <div class="text-right">
+                <button onclick="closeFefoModal()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    Mengerti
+                </button>
+            </div>
+        </div>
+    </div>
     <script>
         const obatSelect = document.getElementById('nama_obat');
         const stokText = document.getElementById('stok-tersedia');
@@ -160,18 +175,66 @@
 
         }
 
+        function openFefoModal() {
+            const modal = document.getElementById('fefo-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeFefoModal() {
+            const modal = document.getElementById('fefo-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+
+            // RESET SELECT
+            obatSelect.selectedIndex = 0;
+
+            // RESET INFO
+            stokText.innerText = '-';
+            batchText.innerText = '-';
+            expText.innerText = '-';
+            jumlahInput.value = '';
+            jumlahInput.max = '';
+        }
+
         obatSelect.addEventListener('change', function() {
+
             const option = this.options[this.selectedIndex];
 
             const stok = option.dataset.stok ?? '-';
             const batch = option.dataset.batch ?? '-';
             const exp = option.dataset.exp ?? '-';
+            const namaDipilih = option.dataset.nama;
+            const expDipilih = new Date(option.dataset.exp);
 
             stokText.innerText = stok;
             batchText.innerText = batch;
             expText.innerText = exp;
 
             jumlahInput.max = stok;
+
+            // VALIDASI FEFO PER NAMA OBAT (FIX STABIL)
+            const warningText = document.getElementById('fefo-warning');
+
+            let expTerdekatStr = null;
+
+            Array.from(this.options).forEach(opt => {
+
+                if (!opt.dataset.nama || !opt.dataset.exp) return;
+
+                if (opt.dataset.nama === namaDipilih) {
+
+                    if (!expTerdekatStr || opt.dataset.exp < expTerdekatStr) {
+                        expTerdekatStr = opt.dataset.exp;
+                    }
+                }
+            });
+
+            if (expTerdekatStr && exp !== expTerdekatStr) {
+                openFefoModal();
+            } else {
+                warningText.classList.add('hidden');
+            }
         });
 
         getRekomendasiFEFO();

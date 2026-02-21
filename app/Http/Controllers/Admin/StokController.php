@@ -47,6 +47,7 @@ class StokController extends Controller
             'id_stok',
             'nama_obat',
             'nama_lokasi',
+            'dosis',
         ];
 
         if (!in_array($sort, $allowedSort)) {
@@ -135,7 +136,8 @@ class StokController extends Controller
             'tanggal_masuk',
             'nomor_batch',
             'jumlah_stok',
-            'id_stok'
+            'id_stok',
+            'dosis'
         ])) {
 
             // SORT MANUAL DARI HEADER
@@ -211,6 +213,7 @@ class StokController extends Controller
             'satuan' => 'required|exists:satuan,id_satuan',
             'tanggal_masuk' => 'required|date',
             'tanggal_exp' => 'required|date|after_or_equal:tanggal_masuk',
+            'dosis' => 'required',
             'lokasi' => 'required|exists:lokasi,id_lokasi',
         ]);
 
@@ -227,6 +230,7 @@ class StokController extends Controller
             'id_jenis' => $request->jenis,
             'id_kategori' => $request->kategori,
             'id_satuan' => $request->satuan,
+            'dosis' => $request->dosis,
             'id_persediaan' => $IdPersediaan,
             'id_lokasi' => $request->lokasi,
         ];
@@ -301,6 +305,7 @@ class StokController extends Controller
             'satuan' => 'required|exists:satuans,id_satuan',
             'tanggal_masuk' => 'required|date',
             'tanggal_exp' => 'required|date|after_or_equal:tanggal_masuk',
+            'dosis' => 'required',
             'lokasi' => 'required|string|max:100',
         ]);
 
@@ -313,6 +318,7 @@ class StokController extends Controller
             'satuan_id' => $request->satuan,
             'tanggal_masuk' => $request->tanggal_masuk,
             'tanggal_exp' => $request->tanggal_exp,
+            'dosis' => $request->dosis,
             'lokasi' => $request->lokasi,
         ]);
 

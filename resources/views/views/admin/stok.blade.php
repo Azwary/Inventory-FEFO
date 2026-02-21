@@ -188,10 +188,7 @@
                     $currentSort = request('sort');
                     $currentDir = request('direction', 'asc');
 
-                    // 🔑 INI YANG KEMARIN KURANG
                     $isActive = $currentSort === $column;
-
-                    // arah sort berikutnya
                     $nextDir = $isActive && $currentDir === 'asc' ? 'desc' : 'asc';
 
                     $url = request()->fullUrlWithQuery([
@@ -200,12 +197,11 @@
                         'page' => 1,
                     ]);
 
-                    // ICON
                     if ($isActive) {
                         $icon = $currentDir === 'asc' ? '▲' : '▼';
                         $color = 'text-blue-600';
                     } else {
-                        $icon = '⇅'; // standby
+                        $icon = '⇅'; 
                         $color = 'text-gray-400';
                     }
 
@@ -236,6 +232,7 @@
                         <th class="border px-3 py-2">BATCH</th>
                         <th class="border px-3 py-2">{!! sortLink('TGL MASUK', 'tanggal_masuk') !!}</th>
                         <th class="border px-3 py-2">{!! sortLink('TGL EXP', 'tanggal_kadaluarsa') !!}</th>
+                        <th class="border px-3 py-2">DOSIS</th>
                         <th class="border px-3 py-2">{!! sortLink('JUMLAH', 'jumlah_stok') !!}</th>
                         <th class="border px-3 py-2">{!! sortLink('LOKASI', 'nama_lokasi') !!}</th>
 
@@ -273,6 +270,7 @@
                                 <td class="border px-3 py-2">{{ $stok->nomor_batch }}</td>
                                 <td class="border px-3 py-2">{{ $stok->tanggal_masuk }}</td>
                                 <td class="border px-3 py-2">{{ $stok->tanggal_kadaluarsa ?? '-' }}</td>
+                                <td class="border px-3 py-2">{{ $stok->barang->dosis ?? '-' }}</td>
                                 <td class="border px-3 py-2 font-semibold text-green-700">
                                     {{ $stok->jumlah_stok }}
                                 </td>
@@ -494,8 +492,12 @@
                         <input type="date" name="tanggal_exp" value="{{ old('tanggal_exp') }}"
                             class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500" required>
                     </div>
-
-                    <div class="md:col-span-2">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Dosis</label>
+                        <input type="text" name="dosis" value="{{ old('dosis') }}"
+                            class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div>
                         <label class="block text-sm font-semibold mb-1">Lokasi</label>
                         <select name="lokasi" class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500"
                             required>
