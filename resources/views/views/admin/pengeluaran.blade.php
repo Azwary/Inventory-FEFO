@@ -132,6 +132,31 @@
             </div>
         </div>
     </div>
+    @if (session('success'))
+        <div id="success-modal" class="fixed inset-0 flex items-center justify-center z-50 ">
+            <div class="bg-white rounded-xl shadow-xl w-96 p-6 animate-fade-in">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="bg-green-100 text-green-600 rounded-full p-2">
+                        ✔
+                    </div>
+                    <h2 class="text-lg font-bold text-green-600">
+                        Transaksi Berhasil
+                    </h2>
+                </div>
+
+                <p class="text-gray-700 mb-4">
+                    {{ session('success') }}
+                </p>
+
+                <div class="text-right">
+                    <button onclick="closeSuccessModal()"
+                        class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
     <script>
         const obatSelect = document.getElementById('nama_obat');
         const stokText = document.getElementById('stok-tersedia');
@@ -213,8 +238,6 @@
 
             jumlahInput.max = stok;
 
-            // VALIDASI FEFO PER NAMA OBAT (FIX STABIL)
-            const warningText = document.getElementById('fefo-warning');
 
             let expTerdekatStr = null;
 
@@ -232,12 +255,24 @@
 
             if (expTerdekatStr && exp !== expTerdekatStr) {
                 openFefoModal();
-            } else {
-                warningText.classList.add('hidden');
             }
         });
 
         getRekomendasiFEFO();
+
+        function closeSuccessModal() {
+            const modal = document.getElementById('success-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
+        @if (session('success'))
+            // Auto close setelah 2.5 detik
+            setTimeout(() => {
+                closeSuccessModal();
+            }, 2500);
+        @endif
     </script>
 
 

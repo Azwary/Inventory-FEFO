@@ -201,7 +201,7 @@
                         $icon = $currentDir === 'asc' ? '▲' : '▼';
                         $color = 'text-blue-600';
                     } else {
-                        $icon = '⇅'; 
+                        $icon = '⇅';
                         $color = 'text-gray-400';
                     }
 
@@ -411,17 +411,9 @@
                     <label for="nama_obat" class="block text-sm font-semibold mb-1">
                         Nama Obat
                     </label>
-                    <select name="nama_obat" id="nama_obat"
-                        class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        required>
-                        <option value="" disabled selected>Pilih Obat..</option>
-                        @foreach ($obats as $obat)
-                            <option value="{{ $obat->id_obat }}"
-                                {{ old('nama_obat') == $obat->id_obat ? 'selected' : '' }}>
-                                {{ $obat->nama_obat }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <input type="text" name="nama_obat" value="{{ old('nama_obat') }}"
+                        class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500"
+                        placeholder="Masukkan Nama Obat" required>
                     @error('nama_obat')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
@@ -494,8 +486,24 @@
                     </div>
                     <div>
                         <label class="block text-sm font-semibold mb-1">Dosis</label>
-                        <input type="text" name="dosis" value="{{ old('dosis') }}"
-                            class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500" required>
+
+                        <div class="flex gap-2">
+                            <input type="number" name="dosis" value="{{ old('dosis') }}"
+                                class="w-1/2 rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500"
+                                placeholder="Contoh: 500" required>
+
+                            <select name="satuan_dosis"
+                                class="w-1/2 rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500" required>
+                                <option value="">Pilih Satuan</option>
+                                <option value="mcg">mcg</option>
+                                <option value="mg">mg</option>
+                                <option value="mL">mL</option>
+                                <option value="%">%</option>
+                                <option value="IU">IU</option>
+                                <option value="mEq">mEq</option>
+                                <option value="mmol">mmol</option>
+                            </select>
+                        </div>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold mb-1">Lokasi</label>
@@ -525,7 +533,32 @@
             </form>
         </div>
     </div>
+    @if (session('success'))
+        <div id="success-modal" class="fixed inset-0 flex items-center justify-center z-50 ">
 
+            <div class="bg-white rounded-xl shadow-xl w-96 p-6 animate-fade-in">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="bg-green-100 text-green-600 rounded-full p-2">
+                        ✔
+                    </div>
+                    <h2 class="text-lg font-bold text-green-600">
+                        Berhasil
+                    </h2>
+                </div>
+
+                <p class="text-gray-700 mb-4">
+                    {{ session('success') }}
+                </p>
+
+                <div class="text-right">
+                    <button onclick="closeSuccessModal()"
+                        class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 
     <script>
         function openModal(id) {
@@ -549,5 +582,18 @@
             btn.disabled = true;
             btn.innerText = 'Menyimpan...';
         }
+
+        function closeSuccessModal() {
+            const modal = document.getElementById('success-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
+        @if (session('success'))
+            setTimeout(() => {
+                closeSuccessModal();
+            }, 2500);
+        @endif
     </script>
 @endsection

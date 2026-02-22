@@ -4,10 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\BarangKeluar;
-use App\Models\BarangMasuk;
 use App\Models\Persediaan;
 use App\Models\StokBarang;
-use App\Models\TrBarangKeluar;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;

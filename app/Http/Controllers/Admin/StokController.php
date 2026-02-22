@@ -11,7 +11,6 @@ use App\Models\Obat;
 use App\Models\Persediaan;
 use App\Models\Satuan;
 use App\Models\StokBarang;
-use App\Models\TrBarangMasuk;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -206,16 +205,18 @@ class StokController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_obat' => 'required|exists:obat,id_obat',
+            'nama_obat' => 'required|string|max:255',
             'jumlah' => 'required|integer|min:1',
             'jenis' => 'required|exists:jenis,id_jenis',
             'kategori' => 'required|exists:kategori,id_kategori',
             'satuan' => 'required|exists:satuan,id_satuan',
             'tanggal_masuk' => 'required|date',
             'tanggal_exp' => 'required|date|after_or_equal:tanggal_masuk',
-            'dosis' => 'required',
+            'dosis' => 'required|numeric',
+            'satuan_dosis' => 'required|string',
             'lokasi' => 'required|exists:lokasi,id_lokasi',
         ]);
+        $dosisGabungan = $request->dosis . ' ' . $request->satuan_dosis;
 
         $IdBarang        = $this->generateId(new Barang(), 'id_barang', 'BR', 3);
         $IdStok          = $this->generateId(new StokBarang(), 'id_stok', 'STB', 2);
@@ -223,14 +224,29 @@ class StokController extends Controller
         $IdPersediaan    = $this->generateId(new Persediaan(), 'id_persediaan', 'PR', 3);
 
         $NoBatch = $this->generateId(new StokBarang(), 'nomor_batch', 'NB', 3);
+        // Cek apakah obat sudah ada (case insensitive)
+        $existingObat = Obat::whereRaw('LOWER(nama_obat) = ?', [
+            strtolower($request->nama_obat)
+        ])->first();
+
+        if ($existingObat) {
+            $idObat = $existingObat->id_obat;
+        } else {
+            $idObat = $this->generateId(new Obat(), 'id_obat', 'OBT', 2);
+
+            Obat::create([
+                'id_obat'   => $idObat,
+                'nama_obat' => $request->nama_obat,
+            ]);
+        }
 
         $barangData = [
             'id_barang' => $IdBarang,
-            'id_obat' => $request->nama_obat,
+            'id_obat' => $idObat,
             'id_jenis' => $request->jenis,
             'id_kategori' => $request->kategori,
             'id_satuan' => $request->satuan,
-            'dosis' => $request->dosis,
+            'dosis' => $dosisGabungan,
             'id_persediaan' => $IdPersediaan,
             'id_lokasi' => $request->lokasi,
         ];
@@ -298,7 +314,7 @@ class StokController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'nama_obat' => 'required|exists:obats,id',
+            'nama_obat' => 'required|string|max:255',
             'batch' => 'required|string|max:50',
             'jumlah' => 'required|integer|min:1',
             'jjenis' => 'required|exists:jeniss,id_jenis',
@@ -308,10 +324,23 @@ class StokController extends Controller
             'dosis' => 'required',
             'lokasi' => 'required|string|max:100',
         ]);
+        $existingObat = Obat::whereRaw('LOWER(nama_obat) = ?', [
+            strtolower($request->nama_obat)
+        ])->first();
 
+        if ($existingObat) {
+            $idObat = $existingObat->id_obat;
+        } else {
+            $idObat = $this->generateId(new Obat(), 'id_obat', 'OBT', 2);
+
+            Obat::create([
+                'id_obat'   => $idObat,
+                'nama_obat' => $request->nama_obat,
+            ]);
+        }
         $stok = Barang::findOrFail($id);
         $stok->update([
-            'obat_id' => $request->nama_obat,
+            'id_obat' => $idObat,
             'batch' => $request->batch,
             'jumlah' => $request->jumlah,
             'jenis_id' => $request->jjenis,
